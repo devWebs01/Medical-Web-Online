@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Modernize Free</title>
+    <title>{{ $title ?? 'Medical' }}</title>
     <link rel="shortcut icon" type="image/png" href="{{ asset('/admin-assets/images/logos/favicon.png') }}" />
     <link rel="stylesheet" href="{{ asset('/admin-assets/css/styles.min.css') }}" />
 
@@ -33,7 +33,7 @@
                         <i class="ti ti-x fs-8"></i>
                     </div>
                 </div>
-                <x-admin-nav></x-admin-nav>
+                <x-app-nav></x-app-nav>
             </div>
             <!-- End Sidebar scroll-->
         </aside>
@@ -59,8 +59,6 @@
                     </ul>
                     <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
                         <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
-                            <a href="https:/adminmart.com/product/modernize-free-bootstrap-admin-dashboard/"
-                                target="_blank" class="btn btn-primary">Download Free</a>
                             <li class="nav-item dropdown">
                                 <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2"
                                     data-bs-toggle="dropdown" aria-expanded="false">
@@ -80,14 +78,14 @@
                                             <i class="ti ti-mail fs-6"></i>
                                             <p class="mb-0 fs-3">My Account</p>
                                         </a>
-                                        <a href="javascript:void(0)"
-                                            class="d-flex align-items-center gap-2 dropdown-item">
-                                            <i class="ti ti-list-check fs-6"></i>
-                                            <p class="mb-0 fs-3">My Task</p>
-                                        </a>
-                                        <a href="./authentication-login.html"
+                                        <a href="{{ route('logout') }}"
+                                            onclick="event.preventDefault();
+                                                      document.getElementById('logout-form').submit();"
                                             class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
                                     </div>
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                        @csrf
+                                    </form>
                                 </div>
                             </li>
                         </ul>
@@ -98,6 +96,16 @@
 
             <!--  Content Start -->
             <div class="container-fluid">
+                <nav class="d-print-none"
+                style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);"
+                aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    @if (isset($header))
+                        {{ $header }}
+                    @endif
+                </ol>
+            </nav>
+            
                 {{ $slot }}
             </div>
             <!--  Content End -->
@@ -112,6 +120,10 @@
     @stack('scripts')
 
     @livewireScripts
+
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <x-livewire-alert::scripts />
 </body>
 
 </html>

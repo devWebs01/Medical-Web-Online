@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class AdminNav extends Component
+class AppNav extends Component
 {
     /**
      * Create a new component instance.
@@ -21,6 +21,6 @@ class AdminNav extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('livewire.components.admin-nav');
+        return view('livewire.components.app-nav');
     }
 }
