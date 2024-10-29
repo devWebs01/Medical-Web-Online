@@ -37,6 +37,24 @@
             </a>
         </li>
 
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ route('medications.index') }}" aria-expanded="false">
+                <span>
+                    <i class="ti ti-layout-dashboard"></i>
+                </span>
+                <span class="hide-menu">Obat</span>
+            </a>
+        </li>
+
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ route('rooms.index') }}" aria-expanded="false">
+                <span>
+                    <i class="ti ti-layout-dashboard"></i>
+                </span>
+                <span class="hide-menu">Kamar</span>
+            </a>
+        </li>
+
     </ul>
 </nav>
 <!-- End Sidebar navigation -->

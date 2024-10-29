@@ -38,7 +38,7 @@ $edit = function () {
 ?>
 
 <x-app-layout>
-    <x-slot name="title">Tambah model Baru</x-slot>
+    <x-slot name="title">Edit model Baru</x-slot>
     <x-slot name="header">
         <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
         <li class="breadcrumb-item"><a href="{{ route('models.index') }}">model</a></li>

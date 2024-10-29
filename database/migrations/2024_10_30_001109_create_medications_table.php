@@ -7,16 +7,17 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Run the migrations with fillable : 'name', 'dosage', 'unit', 'price',
      */
     public function up(): void
     {
-        Schema::create('medicines', function (Blueprint $table) {
+        Schema::create('medications', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('dosage');
-            $table->string('unit');
+            $table->string('dosage')->nullable();
+            // $table->string('unit');
             $table->string('price');
+            $table->string('category');
             $table->timestamps();
         });
     }
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('medicines');
+        Schema::dropIfExists('medications');
     }
 };

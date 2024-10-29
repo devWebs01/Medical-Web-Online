@@ -36,11 +36,11 @@ $create = function () {
 ?>
 
 <x-app-layout>
-    <x-slot name="title">Tambah patient Baru</x-slot>
+    <x-slot name="title">Tambah Pasien Baru</x-slot>
     <x-slot name="header">
         <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('patients.index') }}">patient</a></li>
-        <li class="breadcrumb-item"><a href="#">Tambah patient</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('patients.index') }}">Pasien</a></li>
+        <li class="breadcrumb-item"><a href="#">Tambah Pasien</a></li>
     </x-slot>
 
     @volt
@@ -48,10 +48,10 @@ $create = function () {
             <div class="card">
                 <div class="card-header">
                     <div class="alert alert-primary" role="alert">
-                        <strong>Tambah patient</strong>
-                        <p>Pada halaman tambah pengguna, kamu dapat memasukkan informasi pengguna baru, seperti nama, alamat
-                            phone,
-                            kata sandi, dan peran pengguna (patient)
+                        <strong>Tambah Pasien</strong>
+                        <p>Pada halaman tambah pasien, kamu dapat memasukkan informasi dari pasien baru yang akan disimpan
+                            ke
+                            sistem.
                         </p>
                     </div>
                 </div>

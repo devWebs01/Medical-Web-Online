@@ -1,9 +1,9 @@
 <?php
 
-// app/helpers.php
+// app/Helpers/formatRupiah.php
 if (! function_exists('formatRupiah')) {
     function formatRupiah($amount)
     {
-        return 'Rp '.number_format($amount, 0, ',', '.');
+        return 'Rp ' . number_format($amount, 0, ',', '.');
     }
 }

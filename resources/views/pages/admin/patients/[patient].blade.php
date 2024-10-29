@@ -46,7 +46,7 @@ $edit = function () {
 ?>
 
 <x-app-layout>
-    <x-slot name="title">Tambah Pasien Baru</x-slot>
+    <x-slot name="title">Edit Pasien</x-slot>
     <x-slot name="header">
         <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
         <li class="breadcrumb-item"><a href="{{ route('patients.index') }}">Pasien</a></li>
