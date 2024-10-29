@@ -47,7 +47,7 @@ $destroy = function (model $model) {
 
 <x-app-layout>
     <div>
-        <x-slot name="title">model</x-slot>
+        <x-slot name="title">Data model</x-slot>
         <x-slot name="header">
             <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
             <li class="breadcrumb-item"><a href="{{ route('models.index') }}">model</a></li>

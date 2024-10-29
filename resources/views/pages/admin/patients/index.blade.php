@@ -46,7 +46,7 @@ $destroy = function (patient $patient) {
 
 <x-app-layout>
     <div>
-        <x-slot name="title">patient</x-slot>
+        <x-slot name="title">Data Pasien</x-slot>
         <x-slot name="header">
             <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
             <li class="breadcrumb-item"><a href="{{ route('patients.index') }}">Pasien</a></li>
