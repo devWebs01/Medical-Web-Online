@@ -1,8 +1,11 @@
 <?php
 
 use App\Models\User;
-use function Livewire\Volt\{state, rules};
+use function Livewire\Volt\{state, rules, uses};
 use function Laravel\Folio\name;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
+
+uses([LivewireAlert::class]);
 
 name('users.create');
 
@@ -21,7 +24,7 @@ $create = function () {
 
     $this->reset('name', 'email', 'password', 'telp');
 
-    $this->alert('success', 'Data klinik berhasil di perbaharui!', [
+    $this->alert('success', 'Data klinik berhasil ditambahkan!', [
         'position' => 'top',
         'timer' => 3000,
         'toast' => true,

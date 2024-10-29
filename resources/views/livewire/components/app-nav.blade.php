@@ -28,6 +28,14 @@
                 <span class="hide-menu">Akun Pengguna</span>
             </a>
         </li>
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ route('patients.index') }}" aria-expanded="false">
+                <span>
+                    <i class="ti ti-layout-dashboard"></i>
+                </span>
+                <span class="hide-menu">Pasien</span>
+            </a>
+        </li>
 
     </ul>
 </nav>

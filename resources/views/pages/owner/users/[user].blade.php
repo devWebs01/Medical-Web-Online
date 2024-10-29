@@ -1,9 +1,12 @@
 <?php
 
 use App\Models\User;
-use function Livewire\Volt\{state, rules};
+use function Livewire\Volt\{state, rules, uses};
 use Illuminate\Validation\Rule;
 use function Laravel\Folio\name;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
+
+uses([LivewireAlert::class]);
 
 name('users.edit');
 
@@ -18,7 +21,7 @@ $edit = function () {
         'password' => 'min:5|nullable',
         'telp' => 'required|digits_between:11,12|' . Rule::unique(User::class)->ignore($user->id),
     ]);
-    
+
     $user = $this->user;
 
     // Jika wire:model password terisi, lakukan update password
@@ -30,7 +33,11 @@ $edit = function () {
     }
     $user->update($validateData);
 
-    $this->reset('name', 'email', 'password', 'telp');
+    $this->alert('success', 'Data klinik berhasil diedit!', [
+        'position' => 'top',
+        'timer' => 3000,
+        'toast' => true,
+    ]);
 
     $this->redirectRoute('users.index', navigate: true);
 };
