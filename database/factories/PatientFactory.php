@@ -17,7 +17,11 @@ class PatientFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => fake()->name(),
+            'gender' => fake()->randomElement(['male', 'female']),
+            'dob' => fake()->date(),
+            'address' => fake()->streetAddress(),
+            'phone' => fake()->phoneNumber(),
         ];
     }
 }
