@@ -48,8 +48,6 @@ class User extends Authenticatable
 
     /**
      * Get all of the Appointments for the User
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function appointments(): HasMany
     {

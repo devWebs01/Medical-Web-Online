@@ -1,6 +1,6 @@
 <?php
 
 return [
-    'available' => 'Tersedia (Available)',
-    'occupied' => 'Terisi (Occupied)',
+    'available' => 'Tersedia',
+    'occupied' => 'Terisi',
 ];

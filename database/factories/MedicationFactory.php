@@ -18,7 +18,7 @@ class MedicationFactory extends Factory
     {
         return [
             'name' => fake()->word(),
-            'dosage' => fake()->randomElement([100, 250, 500, 1000]) . 'mg',  // example in mg
+            'dosage' => fake()->randomElement([100, 250, 500, 1000]).'mg',  // example in mg
             // 'unit' => fake()->randomElement(['tablet', 'capsule', 'ml', 'mg']),
             'price' => fake()->randomFloat(2, 5, 1000000),  // example in currency
             'category' => fake()->randomElement(['Antibiotic', 'Painkiller', 'Vitamin', 'Antiseptic']),

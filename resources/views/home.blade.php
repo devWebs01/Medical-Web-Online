@@ -57,7 +57,15 @@ $save = function () {
         <div>
             <div class="card">
                 <div class="card-header">
-                    Janji Temu Pasien
+                    <div class="row">
+                        <div class="col-md">
+                            <span class="fw-bold">Janji Temu Pasien</span>
+                        </div>
+                        <div class="col-md text-md-end">
+                            <a class="btn btn-primary btn-sm" href="{{ route('patients.create') }}" role="button">Tambah
+                                Pasien</a>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     <form action="save" wire:submit='save' method="post">
@@ -65,8 +73,8 @@ $save = function () {
 
                         <div class="d-none mb-3">
                             <label for="date" class="form-label">Tanggal</label>
-                            <input type="dateTime-local" class="form-control" name="date" id="date" wire:model='date'
-                                aria-describedby="Id" placeholder="date" />
+                            <input type="dateTime-local" class="form-control" name="date" id="date"
+                                wire:model='date' aria-describedby="Id" placeholder="date" />
                             @error('date')
                                 <small id="dateId" class="text-danger text-danger">{{ $message }}</small>
                             @enderror
@@ -159,7 +167,8 @@ $save = function () {
                                                 class="badge p-2 bg-warning">{{ __('appointment.' . $appointment->status) }}</span>
                                         </td>
                                         <td>
-                                            <a name="" id="" class="btn btn-primary btn-sm" href="#"
+                                            <a class="btn btn-primary btn-sm"
+                                                href="{{ route('medicalRecord.appointments', ['appointment' => $appointment->id]) }}"
                                                 role="button">Tindakan</a>
                                         </td>
                                     </tr>
