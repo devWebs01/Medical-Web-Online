@@ -6,36 +6,28 @@ use App\Models\InpatientRecord;
 use App\Models\Room;
 use Illuminate\Validation\Rule;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
-use function Livewire\Volt\{state, rules, uses};
+use function Livewire\Volt\{state, rules, uses, mount, boot};
 use function Laravel\Folio\name;
 
 uses([LivewireAlert::class]);
 
-name('medicalRecord.appointments');
+name('appointments.patient');
 
 state([
-    'medicalRecord' => fn() => medicalRecord::where('appointment_id', $this->appointment->id)->first() ?? '',
-    'medical_record_id' => fn() => $this->medicalRecord->id ?? '',
-    'rooms' => fn() => Room::get(),
-
-    'inpatientRecord' => fn() => $this->medicalRecord->inpatientRecords->first() ?? '',
-    'room_id' => fn() => $this->inpatientRecord->room_id ?? '',
-    'admission_date' => fn() => $this->inpatientRecord->admission_date ?? '',
-    'discharge_date' => fn() => $this->inpatientRecord->discharge_date ?? '',
-    'doctor_notes' => fn() => $this->inpatientRecord->doctor_notes ?? '',
-    'status' => fn() => $this->inpatientRecord->status ?? '',
-
-    'appointment', // default id
-]);
-
-state([
+    'medicalRecord' => fn() => MedicalRecord::where('appointment_id', $this->appointment->id)->first(),
+    'rooms' => fn() => Room::all(),
     'appointment_id' => fn() => $this->appointment->id ?? '',
-    'complaint' => fn() => $this->medicalRecord->complaint ?? '',
-    'diagnosis' => fn() => $this->medicalRecord->diagnosis ?? '',
-    'physical_exam' => fn() => $this->medicalRecord->physical_exam ?? '',
-    'recommendation' => fn() => $this->medicalRecord->recommendation ?? '',
-    'appointment' => fn() => $this->medicalRecord->appointment ?? '',
-    'type' => fn() => $this->medicalRecord->type ?? '',
+    'appointment',
+    'room_id',
+    'admission_date',
+    'discharge_date',
+    'doctor_notes',
+    'status',
+    'complaint' => fn() => optional($this->medicalRecord)->complaint,
+    'diagnosis' => fn() => optional($this->medicalRecord)->diagnosis,
+    'physical_exam' => fn() => optional($this->medicalRecord)->physical_exam,
+    'recommendation' => fn() => optional($this->medicalRecord)->recommendation,
+    'type' => fn() => optional($this->medicalRecord)->type,
 ]);
 
 rules([
@@ -45,57 +37,65 @@ rules([
     'physical_exam' => 'nullable|string|max:255',
     'recommendation' => 'nullable|string|max:255',
     'type' => 'required|in:outpatient,inpatient',
-    'room_id' => 'nullable|exists:rooms,id', // Hanya untuk pasien `inpatient`, room_id adalah opsional
+    'room_id' => 'nullable|exists:rooms,id',
     'doctor_notes' => 'nullable|string',
 ]);
 
 $storeMedicalRecord = function () {
-    // Validasi data
     $validateData = $this->validate();
 
-    // Buat atau temukan rekam medis pasien
-    $medicalRecord = MedicalRecord::updateOrCreate(
-        [
-            'appointment_id' => $validateData['appointment_id'],
-        ],
-        $validateData,
-    );
+    $medicalRecord = MedicalRecord::updateOrCreate(['appointment_id' => $validateData['appointment_id']], $validateData);
 
-    // Jika medical record baru dibuat atau ditemukan
     if ($medicalRecord->exists) {
-        $appointment = $this->appointment;
-
-        // Update status janji temu ke 'checked-in'
-        $appointment->update(['status' => 'checked-in']);
-
-        // Cek apakah tipe perawatan adalah `inpatient`
-        if ($validateData['type'] === 'inpatient') {
-            // Buat atau perbarui data `InpatientRecord`
-            InpatientRecord::updateOrCreate(
-                ['medical_record_id' => $medicalRecord->id],
-                [
-                    'room_id' => $validateData['room_id'] ?? null,
-                    'admission_date' => now(),
-                    'discharge_date' => Carbon\carbon::parse(now())->addDay(1),
-                    'doctor_notes' => $validateData['doctor_notes'] ?? null,
-                    'status' => 'active',
-                ],
-            );
-        } else {
-            // Jika tipe diubah ke `outpatient`, hapus data `InpatientRecord`
-            InpatientRecord::where('medical_record_id', $medicalRecord->id)->delete();
-        }
+        $this->updateAppointmentStatus($this->appointment);
+        $this->handleInpatientRecord($medicalRecord, $validateData);
     }
 
-    // Alert sukses
     $this->alert('success', 'Data pemeriksaan berhasil disimpan!', [
         'position' => 'top',
         'timer' => 3000,
         'toast' => true,
     ]);
 
-    // Set properti medicalRecord untuk data yang baru disimpan
     $this->medicalRecord = $medicalRecord;
+};
+
+$updateAppointmentStatus = function ($appointment) {
+    $appointment->update(['status' => 'checked-in']);
+};
+
+$handleInpatientRecord = function ($medicalRecord, $validateData) {
+    if ($validateData['type'] === 'inpatient') {
+        InpatientRecord::updateOrCreate(
+            ['medical_record_id' => $medicalRecord->id],
+            [
+                'room_id' => $validateData['room_id'] ?? null,
+                'admission_date' => now(),
+                'discharge_date' => now()->addDay(1),
+                'doctor_notes' => $validateData['doctor_notes'] ?? null,
+                'status' => 'active',
+            ],
+        );
+    } else {
+        InpatientRecord::where('medical_record_id', $medicalRecord->id)->delete();
+    }
+};
+
+mount(function () {
+    if ($this->medicalRecord) {
+        $this->loadInpatientData($this->medicalRecord);
+    }
+});
+
+$loadInpatientData = function ($medicalRecord) {
+    $inpatientRecord = $medicalRecord->inpatientRecords->first();
+    if ($inpatientRecord) {
+        $this->room_id = $inpatientRecord->room_id;
+        $this->admission_date = $inpatientRecord->admission_date;
+        $this->discharge_date = $inpatientRecord->discharge_date;
+        $this->doctor_notes = $inpatientRecord->doctor_notes;
+        $this->status = $inpatientRecord->status;
+    }
 };
 
 ?>
@@ -246,7 +246,7 @@ $storeMedicalRecord = function () {
             </div>
 
             <div class="mb-3 {{ $medicalRecord != null ?: 'd-none' }}">
-                @include('pages.doctor.medical-records.[medicalRecord]', [
+                @include('pages.doctor.appointments.[medicalRecord]', [
                     'medicalRecord' => $medicalRecord,
                 ])
             </div>

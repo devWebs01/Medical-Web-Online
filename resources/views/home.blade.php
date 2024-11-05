@@ -10,11 +10,13 @@ use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 uses([LivewireAlert::class]);
 
-state(['patient_id', 'doctor_id', 'notes']);
-
 state([
     'doctors' => fn() => User::where('role', 'doctor')->get(),
     'date' => fn() => now(),
+    'patient_id',
+    'doctor_id',
+    'notes',
+    'notes',
 ]);
 
 rules([
@@ -25,9 +27,11 @@ rules([
 ]);
 
 $appointments = computed(function () {
-    return Appointment::all()->sortBy(function ($appointment) {
-        return [$appointment->status !== 'waiting', $appointment->date];
-    });
+    return Appointment::all()
+        ->sortBy(function ($appointment) {
+            return $appointment->date;
+        })
+        ->reverse(); // Untuk membalik urutan jika ingin menurun
 });
 
 $patients = computed(function () {
@@ -36,14 +40,24 @@ $patients = computed(function () {
     })->get();
 });
 
-$save = function () {
+$createAppointment = function () {
     $validateData = $this->validate();
 
     Appointment::create($validateData);
 
     $this->reset('patient_id', 'doctor_id', 'notes');
 
-    $this->alert('success', 'Data klinik berhasil ditambahkan!', [
+    $this->alert('success', 'Janji temu berhasil dibuat!', [
+        'position' => 'top',
+        'timer' => 3000,
+        'toast' => true,
+    ]);
+};
+
+$cancelAppointment = function (appointment $appointment) {
+    $appointment->update(['status' => 'canceled']);
+
+    $this->alert('error', 'Janji temu telah dibatalkan!', [
         'position' => 'top',
         'timer' => 3000,
         'toast' => true,
@@ -68,7 +82,7 @@ $save = function () {
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action="save" wire:submit='save' method="post">
+                    <form action="createAppointment" wire:submit='createAppointment' method="post">
                         @csrf
 
                         <div class="d-none mb-3">
@@ -168,8 +182,14 @@ $save = function () {
                                         </td>
                                         <td>
                                             <a class="btn btn-primary btn-sm"
-                                                href="{{ route('medicalRecord.appointments', ['appointment' => $appointment->id]) }}"
+                                                href="{{ route('appointments.patient', ['appointment' => $appointment->id]) }}"
                                                 role="button">Tindakan</a>
+                                            <button wire:loading.attr='disabled'
+                                                wire:click='cancelAppointment({{ $appointment->id }})'
+                                                wire:confirm="Apakah kamu yakin ingin membatalkan janji temu ini?"
+                                                class="btn btn-sm btn-danger {{ $appointment->status === 'waiting' ?: 'd-none' }}">
+                                                Batalkan
+                                            </button>
                                         </td>
                                     </tr>
                                 @endforeach

@@ -5,19 +5,18 @@ use App\Models\Medication;
 use App\Models\Prescription;
 use Illuminate\Validation\Rule;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
-use function Livewire\Volt\{state, rules, uses};
+use function Livewire\Volt\{state, rules, uses, mount};
 use function Laravel\Folio\name;
 
 uses([LivewireAlert::class]);
 
-name('medicalRecords.prescription');
-
-state(['medicalRecord']);
+name('appointments.prescription');
 
 state([
     'medicines' => [], // Menyimpan daftar obat
     'medical_record_id' => fn() => $this->medicalRecord->id ?? '',
     'medications' => fn() => Medication::get(),
+    'medicalRecord',
 ]);
 
 rules([
@@ -27,17 +26,31 @@ rules([
     'medicines.*.duration' => 'required|string',
 ]);
 
+mount(function () {
+    if ($this->medicalRecord) {
+        $this->medicines = Prescription::where('medical_record_id', $this->medicalRecord->id)
+            ->get()
+            ->toArray();
+    } else {
+        $this->medicines = [];
+    }
+});
+
 $savePrescription = function () {
     $this->validate();
 
     foreach ($this->medicines as $medicine) {
-        Prescription::create([
-            'medical_record_id' => $this->medicalRecord->id,
-            'medicine_id' => $medicine['medicine_id'],
-            'quantity' => $medicine['quantity'],
-            'frequency' => $medicine['frequency'],
-            'duration' => $medicine['duration'],
-        ]);
+        Prescription::updateOrCreate(
+            [
+                'medical_record_id' => $this->medicalRecord->id,
+                'medicine_id' => $medicine['medicine_id'],
+            ],
+            [
+                'quantity' => $medicine['quantity'],
+                'frequency' => $medicine['frequency'],
+                'duration' => $medicine['duration'],
+            ],
+        );
     }
 
     $this->alert('success', 'Resep berhasil disimpan!', [
@@ -46,7 +59,14 @@ $savePrescription = function () {
         'toast' => true,
     ]);
 
-    // $this->reset('medicines'); // Mengosongkan form setelah penyimpanan
+    // Ambil kembali data resep terbaru setelah penyimpanan
+    $this->medicines = Prescription::where('medical_record_id', $this->medicalRecord->id)
+        ->get()
+        ->toArray();
+
+    $this->medicalRecord->appointment->update(['status' => 'completed']);
+
+    $this->redirectRoute('medicalRecords.index', navigate: true);
 };
 
 $addMedicine = function () {
@@ -68,6 +88,7 @@ $removeMedicine = function ($index) {
 
     @volt
         <div>
+            {{ $medicalRecord->appointment->status }}
             <div class="card">
                 <div class="card-header">
                     <div class="alert alert-primary" role="alert">
@@ -153,7 +174,7 @@ $removeMedicine = function ($index) {
                         <div class="row mb-3">
                             <div class="col-auto">
                                 <button type="submit" class="btn btn-primary">
-                                    Simpan Resep
+                                    Simpan Resep & Lanjutkan
                                 </button>
                             </div>
                             <div class="col-auto align-self-center text-end">
