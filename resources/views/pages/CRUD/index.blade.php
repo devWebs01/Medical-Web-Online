@@ -89,7 +89,7 @@ $destroy = function (model $model) {
                                             <td>{{ $model->email }}</td>
                                             <td>{{ $model->telp }}</td>
                                             <td>
-                                                <div class="">
+                                                <div>
                                                     <a href="{{ route('models.edit', ['model' => $model->id]) }}"
                                                         class="btn btn-sm btn-warning">Edit</a>
                                                     <button wire:loading.attr='disabled'

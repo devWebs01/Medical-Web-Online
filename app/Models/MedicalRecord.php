@@ -18,6 +18,7 @@ class MedicalRecord extends Model
         'physical_exam',
         'recommendation',
         'type',
+        'status',
     ];
 
     /**
@@ -47,5 +48,4 @@ class MedicalRecord extends Model
     {
         return $this->hasMany(InpatientRecord::class);
     }
-    
 }

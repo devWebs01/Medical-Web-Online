@@ -92,7 +92,7 @@ $destroy = function (patient $patient) {
                                             <td>{{ $patient->phone }}</td>
                                             <td>{{ Str::limit($patient->address, 20, '...') }}</td>
                                             <td>
-                                                <div class="">
+                                                <div>
                                                     <a href="{{ route('patients.edit', ['patient' => $patient->id]) }}"
                                                         class="btn btn-sm btn-warning">Edit</a>
                                                     <button wire:loading.attr='disabled'

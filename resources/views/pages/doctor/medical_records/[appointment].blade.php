@@ -11,7 +11,7 @@ use function Laravel\Folio\name;
 
 uses([LivewireAlert::class]);
 
-name('appointments.patient');
+name('medicalRecords.patient');
 
 state([
     'medicalRecord' => fn() => MedicalRecord::where('appointment_id', $this->appointment->id)->first(),
@@ -246,7 +246,7 @@ $loadInpatientData = function ($medicalRecord) {
             </div>
 
             <div class="mb-3 {{ $medicalRecord != null ?: 'd-none' }}">
-                @include('pages.doctor.appointments.[medicalRecord]', [
+                @include('pages.doctor.medical_records.[medicalRecord]', [
                     'medicalRecord' => $medicalRecord,
                 ])
             </div>

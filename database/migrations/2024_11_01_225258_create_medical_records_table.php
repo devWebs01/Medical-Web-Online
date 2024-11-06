@@ -24,6 +24,7 @@ return new class extends Migration
             $table->text('physical_exam')->nullable();
             $table->text('recommendation')->nullable();
             $table->enum('type', ['outpatient', 'inpatient']);
+            $table->enum('status', ['in-progress', 'follow-up', 'payment', 'completed'])->default('in-progress');
             $table->timestamps();
         });
     }

@@ -4,6 +4,8 @@ return [
     'waiting' => 'Menunggu',
     'completed' => 'Selesai',
     'canceled' => 'Batal',
-    'checked-in' => 'Pemeriksaan',
+    'in-progress' => 'Pemeriksaan',
+    'follow-up' => 'Tindak Lanjut',
+    'payment' => 'Pembayaran',
 
 ];

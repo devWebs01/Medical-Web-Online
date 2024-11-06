@@ -90,7 +90,7 @@ $destroy = function (medication $medication) {
                                             <td>{{ $medication->dosage }}</td>
                                             <td>{{ formatRupiah($medication->price) }}</td>
                                             <td>
-                                                <div class="">
+                                                <div>
                                                     <a href="{{ route('medications.edit', ['medication' => $medication->id]) }}"
                                                         class="btn btn-sm btn-warning">Edit</a>
                                                     <button wire:loading.attr='disabled'

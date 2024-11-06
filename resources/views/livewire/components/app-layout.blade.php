@@ -69,9 +69,9 @@
                                     aria-labelledby="drop2">
                                     <div class="message-body">
                                         <a href="javascript:void(0)"
-                                            class="d-flex align-items-center gap-2 dropdown-item">
+                                            class="d-flex align-items-center gap-2 dropdown-item fw-bold text-primary">
                                             <i class="ti ti-user fs-6"></i>
-                                            <p class="mb-0 fs-3">My Profile</p>
+                                            <p class="mb-0 fs-3">{{ Auth()->user()->name }}</p>
                                         </a>
                                         <a href="javascript:void(0)"
                                             class="d-flex align-items-center gap-2 dropdown-item">
@@ -97,15 +97,15 @@
             <!--  Content Start -->
             <div class="container-fluid">
                 <nav class="d-print-none"
-                style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);"
-                aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    @if (isset($header))
-                        {{ $header }}
-                    @endif
-                </ol>
-            </nav>
-            
+                    style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);"
+                    aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        @if (isset($header))
+                            {{ $header }}
+                        @endif
+                    </ol>
+                </nav>
+
                 {{ $slot }}
             </div>
             <!--  Content End -->

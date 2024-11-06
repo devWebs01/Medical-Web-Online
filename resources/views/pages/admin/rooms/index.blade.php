@@ -19,9 +19,7 @@ $rooms = computed(function () {
         return room::query()
             ->where(function ($query) {
                 // isi
-                $query->whereAny([ 'room_number',
-        'price',
-        'availability',], 'LIKE', "%{$this->search}%");
+                $query->whereAny(['room_number', 'price', 'availability'], 'LIKE', "%{$this->search}%");
             })
             ->latest()
             ->paginate(10);
@@ -91,7 +89,7 @@ $destroy = function (room $room) {
                                             <td>{{ formatRupiah($room->price) }}</td>
                                             <td>{{ __('room.' . $room->availability) }}</td>
                                             <td>
-                                                <div class="">
+                                                <div>
                                                     <a href="{{ route('rooms.edit', ['room' => $room->id]) }}"
                                                         class="btn btn-sm btn-warning">Edit</a>
                                                     <button wire:loading.attr='disabled'

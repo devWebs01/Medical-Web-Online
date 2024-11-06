@@ -26,23 +26,6 @@ $medicalRecords = computed(function () {
     }
 });
 
-$destroy = function (medicalRecord $medicalRecord) {
-    try {
-        $medicalRecord->delete();
-        $this->alert('success', 'Data medicalRecord berhasil dihapus!', [
-            'position' => 'top',
-            'timer' => 3000,
-            'toast' => true,
-        ]);
-    } catch (\Throwable $th) {
-        $this->alert('error', 'Data medicalRecord gagal dihapus!', [
-            'position' => 'top',
-            'timer' => 3000,
-            'toast' => true,
-        ]);
-    }
-};
-
 ?>
 
 <x-app-layout>
@@ -59,11 +42,7 @@ $destroy = function (medicalRecord $medicalRecord) {
                     <div class="card-header">
                         <div class="row">
                             <div class="col">
-                                <a href="{{ route('medicalRecords.create') }}" class="btn btn-primary">Tambah
-                                    medicalRecord</a>
-                            </div>
-                            <div class="col">
-                                <input wire:medicalRecord.live="search" type="search" class="form-control" name=""
+                                <input wire:model.live="search" type="search" class="form-control" name=""
                                     id="search" aria-describedby="helpId" placeholder="Masukkan nama pengguna" />
                             </div>
                         </div>
@@ -75,9 +54,8 @@ $destroy = function (medicalRecord $medicalRecord) {
                                 <thead>
                                     <tr>
                                         <th>No.</th>
-                                        <th>Nama</th>
-                                        <th>Email</th>
-                                        <th>Telp</th>
+                                        <th>Pasien</th>
+                                        <th>Status</th>
                                         <th>Opsi</th>
                                     </tr>
                                 </thead>
@@ -85,20 +63,23 @@ $destroy = function (medicalRecord $medicalRecord) {
                                     @foreach ($this->medicalRecords as $no => $medicalRecord)
                                         <tr>
                                             <td>{{ ++$no }}</td>
-                                            <td>{{ $medicalRecord->name }}</td>
-                                            <td>{{ $medicalRecord->email }}</td>
-                                            <td>{{ $medicalRecord->telp }}</td>
+                                            <td>{{ $medicalRecord->appointment->patient->name }}</td>
                                             <td>
-                                                <div class="">
-                                                    <a href="{{ route('medicalRecords.edit', ['medicalRecord' => $medicalRecord->id]) }}"
-                                                        class="btn btn-sm btn-warning">Edit</a>
-                                                    <button wire:loading.attr='disabled'
-                                                        wire:click='destroy({{ $medicalRecord->id }})'
-                                                        wire:confirm="Apakah kamu yakin ingin menghapus data ini?"
-                                                        class="btn btn-sm btn-danger">
-                                                        {{ __('Hapus') }}
-                                                    </button>
-                                                </div>
+                                                <span
+                                                    class="badge p-2
+                                                    {{ $medicalRecord->status === 'in-progress' ? 'bg-warning' : '' }}
+                                                    {{ $medicalRecord->status === 'completed' ? 'bg-success' : '' }}
+                                                    {{ $medicalRecord->status === 'follow_up' ? 'bg-danger' : '' }}">
+                                                    {{ __('appointment.' . $medicalRecord->status) }}
+
+                                                </span>
+                                                {{ $medicalRecord->status }}
+                                            </td>
+
+                                            <td>
+                                                <a class="btn btn-primary btn-sm"
+                                                    href="{{ route('medicalRecords.patient', ['appointment' => $medicalRecord->appointment->id]) }}"
+                                                    role="button">Tindakan</a>
                                             </td>
                                         </tr>
                                     @endforeach
