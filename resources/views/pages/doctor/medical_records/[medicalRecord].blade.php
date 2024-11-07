@@ -3,9 +3,10 @@
 use App\Models\MedicalRecord;
 use App\Models\Medication;
 use App\Models\Prescription;
+use App\Models\PaymentRecord;
 use Illuminate\Validation\Rule;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
-use function Livewire\Volt\{state, rules, uses, mount};
+use function Livewire\Volt\{state, rules, uses, mount, on};
 use function Laravel\Folio\name;
 
 uses([LivewireAlert::class]);
@@ -14,6 +15,7 @@ name('medicalRecords.prescription');
 
 state([
     'medicines' => [], // Menyimpan daftar obat
+    'role' => fn() => Auth::user()->role,
     'medical_record_id' => fn() => $this->medicalRecord->id ?? '',
     'medications' => fn() => Medication::get(),
     'medicalRecord',
@@ -39,28 +41,14 @@ mount(function () {
 $savePrescription = function () {
     $this->validate();
 
-    // Dapatkan daftar `medicine_id` yang ada di `$this->medicines`
-    $medicineIds = collect($this->medicines)->pluck('medicine_id')->all();
+    // Panggil fungsi untuk menyimpan resep
+    $this->storePrescriptions();
 
-    // Hapus entri Prescription yang tidak ada dalam daftar $medicineIds
-    Prescription::where('medical_record_id', $this->medicalRecord->id)
-        ->whereNotIn('medicine_id', $medicineIds)
-        ->delete();
+    // Panggil fungsi untuk menghitung total biaya
+    $totalAmount = $this->calculateTotalAmount();
 
-    // Update atau create sesuai data yang ada di `$this->medicines`
-    foreach ($this->medicines as $medicine) {
-        Prescription::updateOrCreate(
-            [
-                'medical_record_id' => $this->medicalRecord->id,
-                'medicine_id' => $medicine['medicine_id'],
-            ],
-            [
-                'quantity' => $medicine['quantity'],
-                'frequency' => $medicine['frequency'],
-                'duration' => $medicine['duration'],
-            ]
-        );
-    }
+    // Panggil fungsi untuk membuat entri pembayaran
+    $this->createPaymentRecord($totalAmount);
 
     $this->alert('success', 'Resep berhasil disimpan!', [
         'position' => 'top',
@@ -73,13 +61,96 @@ $savePrescription = function () {
         ->get()
         ->toArray();
 
-    // Perbarui status medical record jika diperlukan
     $this->medicalRecord->update(['status' => 'completed']);
 
-    // Redirect ke halaman lain setelah penyimpanan
     $this->redirectRoute('medicalRecords.index', navigate: true);
 };
 
+$storePrescriptions = function () {
+    // Pastikan medicalRecord tidak null
+    if (!$this->medicalRecord) {
+        $this->alert('error', 'Rekam medis tidak ditemukan!', [
+            'position' => 'top',
+            'timer' => 3000,
+            'toast' => true,
+        ]);
+        return; // Keluar dari fungsi jika medicalRecord tidak ada
+    }
+
+    try {
+        foreach ($this->medicines as $medicine) {
+            Prescription::updateOrCreate(
+                [
+                    'medical_record_id' => $this->medicalRecord->id,
+                    'medicine_id' => $medicine['medicine_id'],
+                ],
+                [
+                    'quantity' => $medicine['quantity'],
+                    'frequency' => $medicine['frequency'],
+                    'duration' => $medicine['duration'],
+                ],
+            );
+        }
+
+        // Jika berhasil, berikan umpan balik sukses
+        $this->alert('success', 'Resep berhasil disimpan!', [
+            'position' => 'top',
+            'timer' => 3000,
+            'toast' => true,
+        ]);
+    } catch (\Exception $e) {
+        // Tangkap kesalahan dan berikan umpan balik error
+        $this->alert('error', 'Gagal menyimpan resep: ' . $e->getMessage(), [
+            'position' => 'top',
+            'timer' => 3000,
+            'toast' => true,
+        ]);
+    }
+};
+
+$calculateTotalAmount = function () {
+    $totalAmount = 0;
+
+    foreach ($this->medicines as $medicine) {
+        $medication = Medication::find($medicine['medicine_id']);
+        if ($medication) {
+            $totalAmount += $medication->price * $medicine['quantity'];
+        }
+    }
+
+    return $totalAmount;
+};
+
+$createPaymentRecord = function ($totalAmount) {
+    // Cek apakah sudah ada entri pembayaran untuk rekam medis ini
+    $payment = PaymentRecord::where('medical_record_id', $this->medicalRecord->id)->first();
+
+    if ($payment) {
+        // Jika sudah ada, update total amount dan tanggal pembayaran
+        $payment->update([
+            'total_amount' => $totalAmount,
+            'payment_date' => now(),
+        ]);
+    } else {
+        // Jika belum ada, buat entri baru
+        $payment = PaymentRecord::create([
+            'medical_record_id' => $this->medicalRecord->id,
+            'total_amount' => $totalAmount,
+            'payment_date' => now(),
+        ]);
+    }
+
+    // Mengaitkan obat-obatan dengan entri pembayaran
+    foreach ($this->medicines as $medicine) {
+        $medication = Medication::find($medicine['medicine_id']);
+        if ($medication) {
+            $payment->medications()->attach($medicine['medicine_id'], [
+                'quantity' => $medicine['quantity'],
+                'price' => $medication->price,
+            ]);
+        }
+    }
+};
 
 $addMedicine = function () {
     $this->medicines[] = [
@@ -93,7 +164,6 @@ $addMedicine = function () {
 $removeMedicine = function ($index) {
     array_splice($this->medicines, $index, 1);
 };
-
 ?>
 
 <div>
@@ -184,7 +254,7 @@ $removeMedicine = function ($index) {
 
                         <div class="row mb-3">
                             <div class="col-auto">
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary {{ $role === 'doctor' ?: 'd-none' }}">
                                     Simpan Resep & Lanjutkan
                                 </button>
                             </div>

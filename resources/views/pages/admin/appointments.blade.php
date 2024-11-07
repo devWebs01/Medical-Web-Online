@@ -65,7 +65,7 @@ $destroy = function (appointment $appointment) {
                                             <td>{{ $appointment->patient->name }}</td>
                                             <td>
                                                 <span
-                                                    class="badge p-2 bg-primary">{{ __('appointment.' . $appointment->status) }}</span>
+                                                    class="badge p-2 bg-primary">{{ __('status.' . $appointment->status) }}</span>
                                             </td>
                                         </tr>
                                     @endforeach

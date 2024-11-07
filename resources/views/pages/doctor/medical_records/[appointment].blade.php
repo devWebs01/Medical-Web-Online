@@ -14,24 +14,28 @@ uses([LivewireAlert::class]);
 name('medicalRecords.patient');
 
 state([
-    'medicalRecord' => fn() => MedicalRecord::where('appointment_id', $this->appointment->id)->first(),
+    // Get Data
     'rooms' => fn() => Room::all(),
-    'appointment_id' => fn() => $this->appointment->id ?? '',
+    'role' => fn() => Auth::user()->role,
+    'medicalRecord' => fn() => MedicalRecord::where('appointment_id', $this->appointment->id)->first(),
     'appointment',
+
+    // Inpatient MedicalRecord
     'room_id',
     'admission_date',
     'discharge_date',
     'doctor_notes',
     'status',
-    'complaint' => fn() => optional($this->medicalRecord)->complaint,
-    'diagnosis' => fn() => optional($this->medicalRecord)->diagnosis,
-    'physical_exam' => fn() => optional($this->medicalRecord)->physical_exam,
-    'recommendation' => fn() => optional($this->medicalRecord)->recommendation,
-    'type' => fn() => optional($this->medicalRecord)->type,
+
+    // Get MedicalRecord
+    'complaint',
+    'diagnosis',
+    'physical_exam',
+    'recommendation',
+    'type',
 ]);
 
 rules([
-    'appointment_id' => 'required|exists:appointments,id',
     'complaint' => 'required|string|max:255',
     'diagnosis' => 'required|string|max:255',
     'physical_exam' => 'nullable|string|max:255',
@@ -43,6 +47,8 @@ rules([
 
 $storeMedicalRecord = function () {
     $validateData = $this->validate();
+    $validateData['patient_id'] = $this->appointment->patient_id;
+    $validateData['appointment_id'] = $this->appointment->id;
 
     $medicalRecord = MedicalRecord::updateOrCreate(['appointment_id' => $validateData['appointment_id']], $validateData);
 
@@ -84,6 +90,7 @@ $handleInpatientRecord = function ($medicalRecord, $validateData) {
 mount(function () {
     if ($this->medicalRecord) {
         $this->loadInpatientData($this->medicalRecord);
+        $this->loadMedicalRecord($this->medicalRecord);
     }
 });
 
@@ -95,6 +102,16 @@ $loadInpatientData = function ($medicalRecord) {
         $this->discharge_date = $inpatientRecord->discharge_date;
         $this->doctor_notes = $inpatientRecord->doctor_notes;
         $this->status = $inpatientRecord->status;
+    }
+};
+
+$loadMedicalRecord = function ($medicalRecord) {
+    if ($medicalRecord) {
+        $this->complaint = $this->medicalRecord->complaint;
+        $this->diagnosis = $this->medicalRecord->diagnosis;
+        $this->physical_exam = $this->medicalRecord->physical_exam;
+        $this->recommendation = $this->medicalRecord->recommendation;
+        $this->type = $this->medicalRecord->type;
     }
 };
 

@@ -25,4 +25,14 @@ class Patient extends Model
     {
         return $this->hasMany(Appointment::class);
     }
+
+    /**
+     * Get all of the medicalRecords for the Patient
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function medicalRecords(): HasMany
+    {
+        return $this->hasMany(MedicalRecord::class);
+    }
 }

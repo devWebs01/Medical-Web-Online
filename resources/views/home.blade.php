@@ -46,12 +46,8 @@ $appointments = computed(function () {
         return $appointment->status === 'waiting'; // Adjust if needed
     });
 
-    $activeAppointments = $allAppointments->filter(function ($appointment) {
-        return $appointment->status === 'in-progress';
-    });
-
     $completedAppointments = $allAppointments->filter(function ($appointment) {
-        return $appointment->status === 'completed';
+        return $appointment->status === 'checked-in';
     });
 
     $canceledAppointments = $allAppointments->filter(function ($appointment) {
@@ -60,7 +56,6 @@ $appointments = computed(function () {
 
     return (object) [
         'todayAppointments' => $todayAppointments,
-        'activeAppointments' => $activeAppointments,
         'completedAppointments' => $completedAppointments,
         'canceledAppointments' => $canceledAppointments,
     ];
@@ -188,7 +183,9 @@ $cancelAppointment = function (appointment $appointment) {
                 </div>
             @endif
 
-            @include('appointments')
+            <div wire:poll.5s>
+                @include('appointments')
+            </div>
         </div>
     @endvolt
 

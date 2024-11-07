@@ -1,25 +1,25 @@
 <?php
 
-use App\Models\medicalRecord;
+use App\Models\PaymentRecord;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use function Laravel\Folio\name;
 use function Livewire\Volt\{computed, state, usesPagination, uses};
 
 uses([LivewireAlert::class]);
 
-name('medicalRecords.index');
+name('paymentRecords.index');
 
 state(['search'])->url();
 usesPagination(theme: 'bootstrap');
 
-$medicalRecords = computed(function () {
+$paymentRecords = computed(function () {
     if ($this->search == null) {
-        return MedicalRecord::query()->latest()->paginate(10);
+        return PaymentRecord::query()->latest()->paginate(10);
     } else {
-        return MedicalRecord::query()
+        return PaymentRecord::query()
             ->where(function ($query) {
                 // isi
-                $query->whereAny(['appointment_id', 'complaint', 'diagnosis', 'physical_exam', 'recommendation', 'type'], 'LIKE', "%{$this->search}%");
+                $query->whereAny([' '], 'LIKE', "%{$this->search}%");
             })
             ->latest()
             ->paginate(10);
@@ -30,10 +30,10 @@ $medicalRecords = computed(function () {
 
 <x-app-layout>
     <div>
-        <x-slot name="title">Data Rekam Medis</x-slot>
+        <x-slot name="title">Data PaymentRecord</x-slot>
         <x-slot name="header">
             <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('medicalRecords.index') }}">Rekam Medis</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('paymentRecords.index') }}">PaymentRecord</a></li>
         </x-slot>
 
         @volt
@@ -42,7 +42,7 @@ $medicalRecords = computed(function () {
                     <div class="card-header">
                         <div class="row">
                             <div class="col">
-                                <input wire:model.live="search" type="search" class="form-control" name=""
+                                <input wire:PaymentRecord.live="search" type="search" class="form-control" name=""
                                     id="search" aria-describedby="helpId" placeholder="Masukkan nama pengguna" />
                             </div>
                         </div>
@@ -54,26 +54,24 @@ $medicalRecords = computed(function () {
                                 <thead>
                                     <tr>
                                         <th>No.</th>
-                                        <th>Pasien</th>
+                                        <th>Nama Pasien</th>
+                                        <th>Total</th>
                                         <th>Status</th>
                                         <th>Opsi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($this->medicalRecords as $no => $medicalRecord)
+                                    @foreach ($this->PaymentRecords as $no => $paymentRecord)
                                         <tr>
                                             <td>{{ ++$no }}</td>
-                                            <td>{{ $medicalRecord->appointment->patient->name }}</td>
+                                            <td>{{ $paymentRecord->medicalRecord->patient->name }}</td>
+                                            <td>{{ $paymentRecord->total_amount }}</td>
+                                            <td>{{ __('status.' . $paymentRecord->status) }}</td>
                                             <td>
-                                                <span class="badge p-2 bg-primary">
-                                                    {{ __('status.' . $medicalRecord->status) }}
-                                                </span>
-                                            </td>
-
-                                            <td>
-                                                <a class="btn btn-primary btn-sm"
-                                                    href="{{ route('medicalRecords.patient', ['appointment' => $medicalRecord->appointment->id]) }}"
-                                                    role="button">Detail</a>
+                                                <div>
+                                                    <a href="{{ route('paymentRecords.show', ['PaymentRecord' => $paymentRecord->id]) }}"
+                                                        class="btn btn-sm btn-primary">Detail</a>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -81,7 +79,7 @@ $medicalRecords = computed(function () {
                                 </tbody>
                             </table>
 
-                            {{ $this->medicalRecords->links() }}
+                            {{ $this->PaymentRecords->links() }}
                         </div>
 
                     </div>

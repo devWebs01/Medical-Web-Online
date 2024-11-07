@@ -12,6 +12,7 @@ class MedicalRecord extends Model
     use HasFactory;
 
     protected $fillable = [
+        'patient_id',
         'appointment_id',
         'complaint',
         'diagnosis',
@@ -47,5 +48,20 @@ class MedicalRecord extends Model
     public function inpatientRecords(): HasMany
     {
         return $this->hasMany(InpatientRecord::class);
+    }
+
+    /**
+     * Get the patient that owns the MedicalRecord
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function patient(): BelongsTo
+    {
+        return $this->belongsTo(Patient::class);
+    }
+
+    public function paymentRecords(): HasMany
+    {
+        return $this->hasMany(PaymentRecord::class);
     }
 }
