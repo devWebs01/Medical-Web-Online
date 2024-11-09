@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('payment_records', function (Blueprint $table) {
             $table->id();
             $table->foreignId('medical_record_id')->constrained()->onDelete('cascade');
-            $table->decimal('total_amount', 10, 2);
+            $table->string('total_amount');
             $table->date('payment_date');
             $table->enum('status', ['pending', 'completed'])->default('pending');
             $table->timestamps();

@@ -94,6 +94,54 @@ $cancelAppointment = function (appointment $appointment) {
 ?>
 
 <x-app-layout>
+    <div class="row gx-3">
+        <div class="col-xxl-12 col-sm-12">
+            <div class="card mb-3">
+                <div class="card-body text-white rounded-3"
+                    style="
+                    background-image: url('https://bootstrapget.com/demos/medflex-medical-admin-template/assets/images/banner.svg');
+                    background-size: cover;
+                    background-position: right;
+                    ">
+                    <div class="py-4 px-3 text-white">
+                        <h6 class="fw-bold text-white">Hello,</h6>
+                        <h2 class="text-white">{{ Auth()->User()->name }}</h2>
+                        <h5 class="text-white">Jadwal Anda hari ini.</h5>
+                        <div class="mt-4 d-flex gap-3">
+                            <div class="d-flex align-items-center">
+                                <div class="badge bg-primary rounded-3 me-3">
+                                    <i class='bx bx-universal-access fs-6 p-2'></i>
+                                </div>
+                                <div class="d-flex flex-column">
+                                    <h2 class="m-0 lh-1 fw-bolder text-white">9</h2>
+                                    <p class="m-0">Pasien</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="badge bg-primary rounded-3 me-3">
+                                    <i class='bx bxs-user-rectangle fs-6 p-2'></i>
+                                </div>
+                                <div class="d-flex flex-column">
+                                    <h2 class="m-0 lh-1 fw-bolder text-white">3</h2>
+                                    <p class="m-0">Antrian</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="badge bg-primary rounded-3 me-3">
+                                    <i class='bx bxs-bed fs-6 p-2'></i>
+                                </div>
+                                <div class="d-flex flex-column">
+                                    <h2 class="m-0 lh-1 fw-bolder text-white">2</h2>
+                                    <p class="m-0">Rawat Inap</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @volt
         <div>
             @if ($role == 'admin')
@@ -101,10 +149,11 @@ $cancelAppointment = function (appointment $appointment) {
                     <div class="card-header">
                         <div class="row">
                             <div class="col-md">
-                                <span class="fw-bold">Janji Temu Pasien</span>
+                                <span class="fw-bold">Antrian Pasien</span>
                             </div>
                             <div class="col-md text-md-end">
-                                <a class="btn btn-primary btn-sm" href="{{ route('patients.create') }}" role="button">Tambah
+                                <a class="btn btn-primary btn-sm" href="{{ route('patients.create') }}"
+                                    role="button">Tambah
                                     Pasien</a>
                             </div>
                         </div>

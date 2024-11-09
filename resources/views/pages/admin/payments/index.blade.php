@@ -9,26 +9,13 @@ uses([LivewireAlert::class]);
 
 name('paymentRecords.index');
 
-state(['search'])->url();
-usesPagination(theme: 'bootstrap');
-
-$paymentRecords = computed(function () {
-    if ($this->search == null) {
-        return PaymentRecord::query()->latest()->paginate(10);
-    } else {
-        return PaymentRecord::query()
-            ->where(function ($query) {
-                // isi
-                $query->whereAny([' '], 'LIKE', "%{$this->search}%");
-            })
-            ->latest()
-            ->paginate(10);
-    }
-});
+state(['PaymentRecords' => fn() => PaymentRecord::query()->latest()->get()]);
 
 ?>
 
 <x-app-layout>
+    @include('layouts.table')
+
     <div>
         <x-slot name="title">Data PaymentRecord</x-slot>
         <x-slot name="header">
@@ -39,18 +26,10 @@ $paymentRecords = computed(function () {
         @volt
             <div>
                 <div class="card">
-                    <div class="card-header">
-                        <div class="row">
-                            <div class="col">
-                                <input wire:PaymentRecord.live="search" type="search" class="form-control" name=""
-                                    id="search" aria-describedby="helpId" placeholder="Masukkan nama pengguna" />
-                            </div>
-                        </div>
-                    </div>
 
                     <div class="card-body">
-                        <div class="table-responsive border rounded px-3">
-                            <table class="table text-center text-nowrap">
+                        <div class="table-responsive">
+                            <table id="example" class="table table-striped" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th>No.</th>
@@ -61,11 +40,11 @@ $paymentRecords = computed(function () {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($this->PaymentRecords as $no => $paymentRecord)
+                                    @foreach ($PaymentRecords as $no => $paymentRecord)
                                         <tr>
                                             <td>{{ ++$no }}</td>
                                             <td>{{ $paymentRecord->medicalRecord->patient->name }}</td>
-                                            <td>{{ $paymentRecord->total_amount }}</td>
+                                            <td>{{ formatRupiah($paymentRecord->total_amount) }}</td>
                                             <td>{{ __('status.' . $paymentRecord->status) }}</td>
                                             <td>
                                                 <div>
@@ -79,7 +58,7 @@ $paymentRecords = computed(function () {
                                 </tbody>
                             </table>
 
-                            {{ $this->PaymentRecords->links() }}
+
                         </div>
 
                     </div>

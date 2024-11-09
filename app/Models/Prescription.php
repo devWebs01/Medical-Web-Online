@@ -37,4 +37,6 @@ class Prescription extends Model
     {
         return $this->belongsTo(Medication::class, 'medicine_id');
     }
+
+
 }

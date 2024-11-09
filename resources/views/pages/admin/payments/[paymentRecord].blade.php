@@ -15,11 +15,11 @@ state([
     'paymentRecord',
     'medicalRecord',
     'medicines',
-    // isi
+    'totalCost', // Tambahkan total biaya
 ]);
 
 rules([
-    // isi
+    // Tambahkan rules jika diperlukan
 ]);
 
 mount(function ($paymentRecord) {
@@ -29,85 +29,133 @@ mount(function ($paymentRecord) {
     $this->paymentRecord = PaymentRecord::with('medicalRecord')->find($paymentRecordId);
 
     if (!$this->paymentRecord) {
-        // Jika tidak ditemukan, redirect atau tampilkan error
         session()->flash('error', 'Data pembayaran tidak ditemukan.');
         return redirect()->route('medicalRecords.index');
     } else {
         $this->medicalRecord = $this->paymentRecord->medicalRecord;
         $this->medicines = $this->loadMedicines();
+        $this->totalCost = $this->calculateTotalCost();
     }
 });
 
-// Ambil daftar obat yang terkait dengan rekam medis
+// Fungsi untuk memuat data resep
 $loadMedicines = function () {
-    $ab = Prescription::where('medical_record_id', $this->paymentRecord->medicalRecord->id)->get();
-
-    dd($ab);
+    return Prescription::where('medical_record_id', $this->paymentRecord->medicalRecord->id)->get();
 };
 
+// Fungsi untuk menghitung total biaya
+$calculateTotalCost = function () {
+    $type = $this->medicalRecord->type;
+
+    // Biaya tetap
+    $administrationFee = 100000;
+    $consultationFee = 30000;
+
+    // Jika rawat jalan
+    if ($type === 'rawat jalan') {
+        return $administrationFee + $consultationFee;
+    }
+
+    // Jika rawat inap, hitung semua biaya kecuali oksigen
+    $roomFee = 50000;
+    $nursingCare = 20000;
+    $specialTreatment = 30000;
+    $infusionSet = 25000;
+    $infusionFluids = 35000;
+    $nutrition = 45000;
+    $laboratoryFee = 70000;
+
+    $subtotalNonMedicine = $roomFee + $consultationFee + $nursingCare + $specialTreatment + $infusionSet + $infusionFluids + $nutrition + $administrationFee + $laboratoryFee;
+
+    // Tambahkan biaya obat-obatan
+    $medicineCost = $this->medicines->sum(function ($prescription) {
+        return $prescription->medication->price * $prescription->quantity;
+    });
+
+    return $subtotalNonMedicine + $medicineCost;
+};
 ?>
 
+
 <x-app-layout>
-    <x-slot name="title">Edit paymentRecord Baru</x-slot>
-    <x-slot name="header">
-        <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('paymentRecords.index') }}">paymentRecord</a></li>
-        <li class="breadcrumb-item"><a href="#">Edit paymentRecord</a></li>
-    </x-slot>
-
     @volt
+        <x-slot name="title">Edit paymentRecord Baru</x-slot>
+        <x-slot name="header">
+            <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('paymentRecords.index') }}">paymentRecord</a></li>
+            <li class="breadcrumb-item"><a href="#">{{ $medicalRecord->patient->name }}</a></li>
+        </x-slot>
+
         <div>
-            <h1 class="text-2xl font-bold mb-4">Halaman Pembayaran</h1>
+            <div class="card d-print-block border-0">
+                <div class="card-body pt-4 pb-0">
+                    <div class="row">
+                        <h6 class="fw-bolder mb-3">Biodata</h6>
+                        <div class="col-md">
+                            <p><strong>Nama Pasien:</strong> {{ $medicalRecord->patient->name }}</p>
+                            <p><strong>Nomor Rekam Medis:</strong> {{ $medicalRecord->id }}</p>
+                            <p><strong>Jenis Kelamin:</strong> {{ $medicalRecord->patient->gender }}</p>
+                        </div>
+                        <div class="col-md text-md-end">
+                            <p><strong>Tanggal Lahir:</strong>
+                                {{ \Carbon\Carbon::parse($medicalRecord->patient->dob)->format('d M Y') }}</p>
+                            <p><strong>Alamat:</strong> {{ $medicalRecord->patient->address }}</p>
+                            <p><strong>Telepon:</strong> {{ $medicalRecord->patient->phone }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <h6 class="fw-bolder mb-3">Rekam Medis</h6>
+                        <div class="col-md">
+                            <p><strong>Keluhan:</strong>
+                                <br>
+                                {{ $medicalRecord->complaint }}
+                            </p>
+                            <p><strong>Diagnosis:</strong>
+                                <br>
+                                {{ $medicalRecord->diagnosis }}
+                            </p>
+                            <p><strong>Pemeriksaan Fisik:</strong>
+                                <br>
+                                {{ $medicalRecord->physical_exam }}
+                            </p>
+                            <p><strong>Rekomendasi:</strong>
+                                <br>
+                                {{ $medicalRecord->recommendation }}
+                            </p>
 
-            @if (session()->has('error'))
-                <div class="bg-red-500 text-white p-2 rounded mb-4">
-                    {{ session('error') }}
+                        </div>
+                        <div class="col-md text-md-end">
+                            <p><strong>Jenis Rawat:</strong>
+                                <br>
+                                {{ ucfirst($medicalRecord->type) }}
+                            </p>
+                            <p><strong>Status:</strong>
+                                <br>
+                                {{ ucfirst($medicalRecord->status) }}
+                            </p>
+                            <p><strong>Tanggal Dibuat:</strong>
+                                <br>
+                                {{ \Carbon\Carbon::parse($medicalRecord->created_at)->format('d M Y H:i') }}
+                            </p>
+                        </div>
+                    </div>
+                    <hr>
                 </div>
-            @endif
 
-            <h2 class="text-xl font-semibold">Data Rekam Medis</h2>
-            <p><strong>Nama Pasien:</strong> {{ $medicalRecord->patient_name }}</p>
-            <p><strong>Nomor Rekam Medis:</strong> {{ $medicalRecord->id }}</p>
-            <p><strong>Tanggal:</strong> {{ $medicalRecord->created_at->format('d-m-Y') }}</p>
+                @include('pages.admin.payments.medicalRecord', ['medicalRecord' => $medicalRecord])
 
-            <h2 class="text-xl font-semibold mt-4">Daftar Obat</h2>
-            <table class="min-w-full border-collapse border border-gray-300">
-                <thead>
-                    <tr>
-                        <th class="border border-gray-300 p-2">Nama Obat</th>
-                        <th class="border border-gray-300 p-2">Harga</th>
-                        <th class="border border-gray-300 p-2">Jumlah</th>
-                        <th class="border border-gray-300 p-2">Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($medicines as $prescription)
-                        <tr>
-                            <td class="border border-gray-300 p-2">{{ $prescription->medicine->name }}</td>
-                            <td class="border border-gray-300 p-2">{{ number_format($prescription->medicine->price, 2) }}
-                            </td>
-                            <td class="border border-gray-300 p-2">{{ $prescription->quantity }}</td>
-                            <td class="border border-gray-300 p-2">
-                                {{ number_format($prescription->medicine->price * $prescription->quantity, 2) }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
 
-            <div class="mt-4">
-                <h2 class="text-xl font-semibold">Total Pembayaran:
-                    {{ number_format(
-                        $medicines->sum(function ($prescription) {
-                            return $prescription->medicine->price * $prescription->quantity;
-                        }),
-                        2,
-                    ) }}
-                </h2>
-            </div>
-
-            <div class="mt-4">
-                <button class="bg-blue-500 text-white px-4 py-2 rounded" wire:click="confirmPayment">Konfirmasi
-                    Pembayaran</button>
+                <div class="card-footer">
+                    <div class="col-12">
+                        <span class="fw-medium text-heading">Note:</span>
+                        <span>{{ $medicalRecord->note ?? '-' }}</span>
+                    </div>
+                    <div class="mt-4">
+                        <button class="btn btn-primary rounded" wire:click="confirmPayment">Konfirmasi
+                            Pembayaran</button>
+                    </div>
+                </div>
             </div>
         </div>
     @endvolt
