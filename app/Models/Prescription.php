@@ -16,6 +16,7 @@ class Prescription extends Model
         'quantity',
         'frequency',
         'duration',
+        'note',
     ];
 
     /**

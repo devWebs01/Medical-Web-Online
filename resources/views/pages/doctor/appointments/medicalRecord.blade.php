@@ -11,7 +11,7 @@ use function Laravel\Folio\name;
 
 uses([LivewireAlert::class]);
 
-name('medicalRecords.prescription');
+name('appointments.prescription');
 
 state([
     'medicines' => [], // Menyimpan daftar obat
@@ -29,15 +29,16 @@ rules([
 ]);
 
 mount(function ($medicalRecord) {
-    $medicalRecord = MedicalRecord::find($medicalRecord->id);
-
-    if ($medicalRecord) {
-        $this->medicines = Prescription::where('medical_record_id', $this->medicalRecord->id)
+    // Pastikan $medicalRecord terisi dan memiliki ID sebelum mengakses property-nya
+    if ($medicalRecord && $medicalRecord->id) {
+        $this->medicalRecord = $medicalRecord;
+        $this->medicines = Prescription::where('medical_record_id', $medicalRecord->id)
             ->get()
             ->toArray();
     } else {
+        $this->medicalRecord = null;
         $this->medicines = [];
-        $this->alert('error', 'Rekam medis tidak ditemukan!', [
+        $this->alert('warning', 'Lengkap Data Rekam Medis!', [
             'position' => 'top',
             'timer' => 3000,
             'toast' => true,
@@ -45,36 +46,60 @@ mount(function ($medicalRecord) {
     }
 });
 
-$savePrescription = function () {
+$saveMedicalRecord = function () {
+    if (!$this->medicalRecord || !$this->medicalRecord->id) {
+        $this->alert('error', 'Rekam medis tidak ditemukan!', [
+            'position' => 'top',
+            'timer' => 3000,
+            'toast' => true,
+        ]);
+        return;
+    }
+
     $this->validate();
 
     // Panggil fungsi untuk menyimpan resep
     $this->storePrescriptions();
 
-    // Panggil fungsi untuk menghitung total biaya
+    // Panggil fungsi untuk menangani perubahan tipe pasien
+    $this->handlePaymentOnTypeChange();
+
+    // Hitung total biaya obat
     $totalAmount = $this->calculateTotalAmount();
 
-    // Panggil fungsi untuk membuat entri pembayaran
-    $this->createPaymentRecord($totalAmount);
+    // Simpan pembayaran hanya jika rawat jalan
+    if ($this->medicalRecord->type === 'outpatient') {
+        $this->createPaymentRecord($totalAmount);
+        $this->medicalRecord->update(['status' => 'completed']);
 
-    $this->alert('success', 'Resep berhasil disimpan!', [
-        'position' => 'top',
-        'timer' => 3000,
-        'toast' => true,
-    ]);
+        $this->alert('success', 'Resep dan pembayaran berhasil disimpan!', [
+            'position' => 'top',
+            'timer' => 3000,
+            'toast' => true,
+        ]);
+    } else {
+        // Jika rawat inap, status menjadi 'follow-up'
+        $this->medicalRecord->update(['status' => 'follow-up']);
 
-    // Ambil kembali data resep terbaru setelah penyimpanan
+        $this->alert('success', 'Resep berhasil disimpan untuk pasien rawat inap!', [
+            'position' => 'top',
+            'timer' => 3000,
+            'toast' => true,
+        ]);
+    }
+
+    // Ambil kembali data resep terbaru
     $this->medicines = Prescription::where('medical_record_id', $this->medicalRecord->id)
         ->get()
         ->toArray();
 
-    $this->medicalRecord->update(['status' => 'completed']);
-
-    $this->redirectRoute('medicalRecords.index', navigate: true);
+    // Redirect ke halaman daftar rekam medis
+    $this->redirectRoute('medicalRecords.index');
 };
 
+
 $storePrescriptions = function () {
-    if (!$this->medicalRecord) {
+    if (!$this->medicalRecord || !$this->medical_record_id) {
         $this->alert('error', 'Rekam medis tidak ditemukan!', [
             'position' => 'top',
             'timer' => 3000,
@@ -89,20 +114,16 @@ $storePrescriptions = function () {
 
         // Simpan resep baru
         foreach ($this->medicines as $medicine) {
-            Prescription::create([
-                'medical_record_id' => $this->medicalRecord->id,
-                'medicine_id' => $medicine['medicine_id'],
-                'quantity' => $medicine['quantity'],
-                'frequency' => $medicine['frequency'],
-                'duration' => $medicine['duration'],
-            ]);
+            if (isset($medicine['medicine_id'])) {
+                Prescription::create([
+                    'medical_record_id' => $this->medicalRecord->id,
+                    'medicine_id' => $medicine['medicine_id'],
+                    'quantity' => $medicine['quantity'],
+                    'frequency' => $medicine['frequency'],
+                    'duration' => $medicine['duration'],
+                ]);
+            }
         }
-
-        $this->alert('success', 'Resep berhasil disimpan!', [
-            'position' => 'top',
-            'timer' => 3000,
-            'toast' => true,
-        ]);
     } catch (\Exception $e) {
         $this->alert('error', 'Gagal menyimpan resep: ' . $e->getMessage(), [
             'position' => 'top',
@@ -126,6 +147,15 @@ $calculateTotalAmount = function () {
 };
 
 $createPaymentRecord = function ($totalAmount) {
+    if (!$this->medicalRecord || !$this->medicalRecord->id) {
+        $this->alert('error', 'Rekam medis tidak ditemukan!', [
+            'position' => 'top',
+            'timer' => 3000,
+            'toast' => true,
+        ]);
+        return;
+    }
+
     // Cek apakah sudah ada entri pembayaran untuk rekam medis ini
     $payment = PaymentRecord::where('medical_record_id', $this->medicalRecord->id)->first();
 
@@ -156,6 +186,31 @@ $createPaymentRecord = function ($totalAmount) {
     }
 };
 
+$handlePaymentOnTypeChange = function () {
+    if (!$this->medicalRecord || !$this->medicalRecord->id) {
+        return;
+    }
+
+    // Cek apakah sudah ada entri pembayaran untuk rekam medis ini
+    $payment = PaymentRecord::where('medical_record_id', $this->medicalRecord->id)->first();
+
+    if ($payment) {
+        // Jika tipe pasien berubah menjadi rawat inap, hapus pembayaran
+        if ($this->medicalRecord->type === 'inpatient') {
+            $payment->medications()->detach();
+            $payment->delete();
+        } else {
+            // Jika tetap rawat jalan, perbarui pembayaran
+            $totalAmount = $this->calculateTotalAmount();
+            $payment->update([
+                'total_amount' => $totalAmount,
+                'payment_date' => now(),
+            ]);
+        }
+    }
+};
+
+
 $addMedicine = function () {
     $this->medicines[] = [
         'medicine_id' => '',
@@ -184,7 +239,7 @@ $removeMedicine = function ($index) {
                     </button>
                 </div>
                 <div class="card-body">
-                    <form wire:submit.prevent="savePrescription">
+                    <form wire:submit.prevent="saveMedicalRecord">
                         @csrf
 
                         @foreach ($medicines as $index => $medicine)
@@ -258,7 +313,10 @@ $removeMedicine = function ($index) {
 
                         <div class="row mb-3">
                             <div class="col-auto">
-                                <button type="submit" class="btn btn-primary {{ $role === 'doctor' ?: 'd-none' }}">
+                                <button type="submit"
+                                    class="btn btn-primary
+                                {{-- {{ $role === 'doctor' ?: 'd-none' }} --}}
+                                 ">
                                     Simpan Resep & Lanjutkan
                                 </button>
                             </div>

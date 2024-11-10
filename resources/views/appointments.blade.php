@@ -49,8 +49,10 @@
                                                 class="badge p-2 bg-warning">{{ __('status.' . $appointment->status) }}</span>
                                         </td>
                                         <td>
-                                            <a class="btn btn-primary btn-sm {{ Auth()->user()->role === 'doctor' ?: 'd-none' }}"
-                                                href="{{ route('medicalRecords.patient', ['appointment' => $appointment->id]) }}"
+                                            <a class="btn btn-primary btn-sm
+                                            {{-- {{ Auth()->user()->role === 'doctor' ?: 'd-none' }} --}}
+                                             "
+                                                href="{{ route('appointments.patient', ['appointment' => $appointment->id]) }}"
                                                 role="button">Tindakan</a>
                                             <button wire:loading.attr='disabled'
                                                 wire:click='cancelAppointment({{ $appointment->id }})'
@@ -94,7 +96,7 @@
                                         </td>
                                         <td>
                                             <a class="btn btn-primary btn-sm"
-                                                href="{{ route('medicalRecords.patient', ['appointment' => $appointment->id]) }}"
+                                                href="{{ route('appointments.patient', ['appointment' => $appointment->id]) }}"
                                                 role="button">Detail</a>
                                         </td>
                                     </tr>

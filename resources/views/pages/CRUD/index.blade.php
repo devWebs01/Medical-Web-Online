@@ -82,18 +82,18 @@ $destroy = function (model $model) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($this->models as $no => $model)
+                                    @foreach ($this->models as $no => $item)
                                         <tr>
                                             <td>{{ ++$no }}</td>
-                                            <td>{{ $model->name }}</td>
-                                            <td>{{ $model->email }}</td>
-                                            <td>{{ $model->telp }}</td>
+                                            <td>{{ $item->name }}</td>
+                                            <td>{{ $item->email }}</td>
+                                            <td>{{ $item->telp }}</td>
                                             <td>
                                                 <div>
-                                                    <a href="{{ route('models.edit', ['model' => $model->id]) }}"
+                                                    <a href="{{ route('models.edit', ['model' => $item->id]) }}"
                                                         class="btn btn-sm btn-warning">Edit</a>
                                                     <button wire:loading.attr='disabled'
-                                                        wire:click='destroy({{ $model->id }})'
+                                                        wire:click='destroy({{ $item->id }})'
                                                         wire:confirm="Apakah kamu yakin ingin menghapus data ini?"
                                                         class="btn btn-sm btn-danger">
                                                         {{ __('Hapus') }}

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('quantity');
             $table->string('frequency');
             $table->string('duration');
+            $table->enum('note', ['Resep Dokter', 'Tambahan Lainnya'])->default('Resep Dokter');
             $table->timestamps();
         });
     }

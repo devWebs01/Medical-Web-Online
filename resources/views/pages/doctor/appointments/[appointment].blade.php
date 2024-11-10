@@ -11,7 +11,7 @@ use function Laravel\Folio\name;
 
 uses([LivewireAlert::class]);
 
-name('medicalRecords.patient');
+name('appointments.patient');
 
 state([
     // Get Data
@@ -41,7 +41,7 @@ rules([
     'physical_exam' => 'nullable|string|max:255',
     'recommendation' => 'nullable|string|max:255',
     'type' => 'required|in:outpatient,inpatient',
-    'room_id' => 'nullable|exists:rooms,id',
+    'room_id' => 'required|exists:rooms,id',
     'doctor_notes' => 'nullable|string',
 ]);
 
@@ -64,6 +64,8 @@ $storeMedicalRecord = function () {
     ]);
 
     $this->medicalRecord = $medicalRecord;
+
+    $this->redirectRoute('appointments.patient', ['appointment' => $this->appointment], navigate: true);
 };
 
 $updateAppointmentStatus = function ($appointment) {
@@ -202,6 +204,10 @@ $loadMedicalRecord = function ($medicalRecord) {
                             <div class="mb-3">
                                 <label for="rooms" class="form-label">Pilih Kamar</label>
 
+                                @error('room_id')
+                                    <p id="room_id" class="form-text text-danger">{{ $message }}</p>
+                                @enderror
+
                                 <div class="row">
                                     @foreach ($rooms as $room)
                                         <div class="col-md">
@@ -263,7 +269,7 @@ $loadMedicalRecord = function ($medicalRecord) {
             </div>
 
             <div class="mb-3 {{ $medicalRecord != null ?: 'd-none' }}">
-                @include('pages.doctor.medical_records.[medicalRecord]', [
+                @include('pages.doctor.appointments.medicalRecord', [
                     'medicalRecord' => $medicalRecord,
                 ])
             </div>

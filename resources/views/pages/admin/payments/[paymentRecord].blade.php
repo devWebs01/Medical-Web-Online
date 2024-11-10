@@ -15,7 +15,8 @@ state([
     'paymentRecord',
     'medicalRecord',
     'medicines',
-    'totalCost', // Tambahkan total biaya
+    'selectedFees' => [], // Tambahkan biaya yang dipilih
+    'totalCost',
 ]);
 
 rules([
@@ -25,17 +26,16 @@ rules([
 mount(function ($paymentRecord) {
     $paymentRecordId = $paymentRecord->id;
 
-    // Ambil data rekam medis berdasarkan ID
     $this->paymentRecord = PaymentRecord::with('medicalRecord')->find($paymentRecordId);
 
     if (!$this->paymentRecord) {
         session()->flash('error', 'Data pembayaran tidak ditemukan.');
         return redirect()->route('medicalRecords.index');
-    } else {
-        $this->medicalRecord = $this->paymentRecord->medicalRecord;
-        $this->medicines = $this->loadMedicines();
-        $this->totalCost = $this->calculateTotalCost();
     }
+
+    $this->medicalRecord = $this->paymentRecord->medicalRecord;
+    $this->medicines = $this->loadMedicines();
+    $this->totalCost = $this->calculateTotalCost();
 });
 
 // Fungsi untuk memuat data resep
@@ -47,16 +47,9 @@ $loadMedicines = function () {
 $calculateTotalCost = function () {
     $type = $this->medicalRecord->type;
 
-    // Biaya tetap
+    // Biaya dasar
     $administrationFee = 100000;
     $consultationFee = 30000;
-
-    // Jika rawat jalan
-    if ($type === 'rawat jalan') {
-        return $administrationFee + $consultationFee;
-    }
-
-    // Jika rawat inap, hitung semua biaya kecuali oksigen
     $roomFee = 50000;
     $nursingCare = 20000;
     $specialTreatment = 30000;
@@ -65,98 +58,146 @@ $calculateTotalCost = function () {
     $nutrition = 45000;
     $laboratoryFee = 70000;
 
-    $subtotalNonMedicine = $roomFee + $consultationFee + $nursingCare + $specialTreatment + $infusionSet + $infusionFluids + $nutrition + $administrationFee + $laboratoryFee;
+    // Biaya tambahan yang dipilih oleh admin
+    $additionalFees = [
+        'administration' => $administrationFee,
+        'consultation' => $consultationFee,
+        'room' => $roomFee,
+        'nursing' => $nursingCare,
+        'special_treatment' => $specialTreatment,
+        'infusion_set' => $infusionSet,
+        'infusion_fluids' => $infusionFluids,
+        'nutrition' => $nutrition,
+        'laboratory' => $laboratoryFee,
+    ];
+
+    // Hitung total biaya berdasarkan pilihan admin
+    $subtotalNonMedicine = collect($this->selectedFees)
+        ->map(fn($fee) => $additionalFees[$fee] ?? 0)
+        ->sum();
 
     // Tambahkan biaya obat-obatan
-    $medicineCost = $this->medicines->sum(function ($prescription) {
-        return $prescription->medication->price * $prescription->quantity;
-    });
+    $medicineCost = $this->medicines->sum(fn($prescription) => $prescription->medication->price * $prescription->quantity);
 
     return $subtotalNonMedicine + $medicineCost;
+};
+
+// Fungsi untuk konfirmasi pembayaran
+$confirmPayment = function () {
+    $this->totalCost = $this->calculateTotalCost();
+    $this->alert('success', 'Pembayaran berhasil dikonfirmasi.', ['position' => 'center']);
 };
 ?>
 
 
 <x-app-layout>
     @volt
-        <x-slot name="title">Edit paymentRecord Baru</x-slot>
+        <x-slot name="title">Pembayaran {{ $medicalRecord->patient->name }}</x-slot>
         <x-slot name="header">
             <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
             <li class="breadcrumb-item"><a href="{{ route('paymentRecords.index') }}">paymentRecord</a></li>
             <li class="breadcrumb-item"><a href="#">{{ $medicalRecord->patient->name }}</a></li>
         </x-slot>
 
+
+
         <div>
-            <div class="card d-print-block border-0">
-                <div class="card-body pt-4 pb-0">
-                    <div class="row">
-                        <h6 class="fw-bolder mb-3">Biodata</h6>
-                        <div class="col-md">
-                            <p><strong>Nama Pasien:</strong> {{ $medicalRecord->patient->name }}</p>
-                            <p><strong>Nomor Rekam Medis:</strong> {{ $medicalRecord->id }}</p>
-                            <p><strong>Jenis Kelamin:</strong> {{ $medicalRecord->patient->gender }}</p>
-                        </div>
-                        <div class="col-md text-md-end">
-                            <p><strong>Tanggal Lahir:</strong>
-                                {{ \Carbon\Carbon::parse($medicalRecord->patient->dob)->format('d M Y') }}</p>
-                            <p><strong>Alamat:</strong> {{ $medicalRecord->patient->address }}</p>
-                            <p><strong>Telepon:</strong> {{ $medicalRecord->patient->phone }}</p>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <h6 class="fw-bolder mb-3">Rekam Medis</h6>
-                        <div class="col-md">
-                            <p><strong>Keluhan:</strong>
-                                <br>
-                                {{ $medicalRecord->complaint }}
-                            </p>
-                            <p><strong>Diagnosis:</strong>
-                                <br>
-                                {{ $medicalRecord->diagnosis }}
-                            </p>
-                            <p><strong>Pemeriksaan Fisik:</strong>
-                                <br>
-                                {{ $medicalRecord->physical_exam }}
-                            </p>
-                            <p><strong>Rekomendasi:</strong>
-                                <br>
-                                {{ $medicalRecord->recommendation }}
-                            </p>
 
+            <div class="card">
+                <div class="card-body">
+                    <div class="accordion" id="accordionExample">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#administration" aria-expanded="false" aria-controls="administration">
+                                    <strong>
+                                        Data Pasien
+                                    </strong>
+                                </button>
+                            </h2>
+                            <div id="administration" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    @include('pages.admin.payments.loadPatient', [
+                                        'medicalRecord' => $medicalRecord,
+                                    ])
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md text-md-end">
-                            <p><strong>Jenis Rawat:</strong>
-                                <br>
-                                {{ ucfirst($medicalRecord->type) }}
-                            </p>
-                            <p><strong>Status:</strong>
-                                <br>
-                                {{ ucfirst($medicalRecord->status) }}
-                            </p>
-                            <p><strong>Tanggal Dibuat:</strong>
-                                <br>
-                                {{ \Carbon\Carbon::parse($medicalRecord->created_at)->format('d M Y H:i') }}
-                            </p>
-                        </div>
-                    </div>
-                    <hr>
-                </div>
-
-                @include('pages.admin.payments.medicalRecord', ['medicalRecord' => $medicalRecord])
 
 
-                <div class="card-footer">
-                    <div class="col-12">
-                        <span class="fw-medium text-heading">Note:</span>
-                        <span>{{ $medicalRecord->note ?? '-' }}</span>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#administration" aria-expanded="true" aria-controls="administration">
+                                    <strong>
+                                        Administrasi
+                                    </strong>
+                                </button>
+                            </h2>
+                            <div id="administration" class="accordion-collapse collapse show"
+                                data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    @include('pages.admin.payments.loadMedicines')
+
+                                    <hr>
+
+                                    <div class="mb-4">
+                                        <h6 class="fw-bolder">Biaya Tambahan:</h6>
+                                        <div class="form-check">
+                                            <input type="checkbox" wire:model="selectedFees" value="administration"
+                                                class="form-check-input"> Administrasi (Rp 100.000)
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="checkbox" wire:model="selectedFees" value="consultation"
+                                                class="form-check-input"> Konsultasi Dokter (Rp 30.000)
+                                        </div>
+                                        @if ($medicalRecord->type === 'rawat inap')
+                                            <div class="form-check">
+                                                <input type="checkbox" wire:model="selectedFees" value="room"
+                                                    class="form-check-input"> Biaya Kamar (Rp 50.000)
+                                            </div>
+                                            <div class="form-check">
+                                                <input type="checkbox" wire:model="selectedFees" value="nursing"
+                                                    class="form-check-input"> Perawatan (Rp 20.000)
+                                            </div>
+                                            <div class="form-check">
+                                                <input type="checkbox" wire:model="selectedFees" value="special_treatment"
+                                                    class="form-check-input"> Perawatan Khusus (Rp 30.000)
+                                            </div>
+                                            <div class="form-check">
+                                                <input type="checkbox" wire:model="selectedFees" value="infusion_set"
+                                                    class="form-check-input"> Set Infus (Rp 25.000)
+                                            </div>
+                                            <div class="form-check">
+                                                <input type="checkbox" wire:model="selectedFees" value="infusion_fluids"
+                                                    class="form-check-input"> Cairan Infus (Rp 35.000)
+                                            </div>
+                                            <div class="form-check">
+                                                <input type="checkbox" wire:model="selectedFees" value="nutrition"
+                                                    class="form-check-input"> Nutrisi (Rp 45.000)
+                                            </div>
+                                            <div class="form-check">
+                                                <input type="checkbox" wire:model="selectedFees" value="laboratory"
+                                                    class="form-check-input"> Biaya Laboratorium (Rp 70.000)
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <hr>
+
+                                    <h5>Total Biaya: Rp {{ formatRupiah($totalCost) }}</h5>
+                                    <button class="btn btn-primary" wire:click="confirmPayment">Konfirmasi
+                                        Pembayaran</button>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
-                    <div class="mt-4">
-                        <button class="btn btn-primary rounded" wire:click="confirmPayment">Konfirmasi
-                            Pembayaran</button>
-                    </div>
+
                 </div>
             </div>
+
+
         </div>
     @endvolt
 </x-app-layout>

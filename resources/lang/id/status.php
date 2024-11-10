@@ -12,6 +12,10 @@ return [
     'follow-up' => 'Tindak Lanjut',
     'payment' => 'Pembayaran',
 
+    // InpatientRecord
+    'outpatient' => 'Rawat Jalan',
+    'inpatient' => 'Rawat Inap (One Day Care)',
+
     // payment
     'pending' => 'Belum Dibayar',
 
