@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('medical_record_id')->constrained()->onDelete('cascade');
             $table->string('total_amount');
             $table->date('payment_date');
-            $table->enum('status', ['pending', 'completed'])->default('pending');
+            $table->enum('status', ['unpaid', 'paid'])->default('unpaid');
             $table->timestamps();
         });
 

@@ -2,9 +2,10 @@
 
 use App\Models\PaymentRecord;
 use App\Models\Prescription;
-use Illuminate\Validation\Rule;
+use App\Models\Medication;
+use Illuminate\Support\Facades\DB;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
-use function Livewire\Volt\{state, rules, uses, mount};
+use function Livewire\Volt\{state, rules, uses, mount, on};
 use function Laravel\Folio\name;
 
 uses([LivewireAlert::class]);
@@ -15,13 +16,84 @@ state([
     'paymentRecord',
     'medicalRecord',
     'medicines',
-    'selectedFees' => [], // Tambahkan biaya yang dipilih
-    'totalCost',
+    'appointmentId',
+    'additionalFees' => [],
+    'prescriptions' => fn() => Prescription::where('medical_record_id', $this->appointmentId)->get(),
+    'medications' => Medication::all(),
+    'selectedFees' => [], // Biaya tambahan yang dipilih
+    'totalCost' => 0,
+]);
+
+on([
+    'prescription-updated' => function () {
+        $this->prescriptions = Prescription::where('appointment_id', $this->appointmentId)->get();
+        $this->calculateTotalCost();
+    },
 ]);
 
 rules([
     // Tambahkan rules jika diperlukan
 ]);
+
+$additionalFees = [
+    'administrasi' => 100000,
+    'konsultasi_dokter' => 30000,
+    'perawatan' => 20000,
+    'perawatan_khusus' => 30000,
+    'nutrisi' => 45000,
+];
+
+$calculateTotalCost = function () use ($additionalFees) {
+    $doctorPrescriptions = $this->medicines->sum(function ($prescription) {
+        return $prescription->medication->price * $prescription->quantity;
+    });
+
+    $costRoom = $this->medicalRecord->type === 'outpatient' ? 0 : 50000;
+
+    $medicationTotal = $this->prescriptions->sum(fn($item) => $item->medication->price * $item->qty);
+    $additionalTotal = collect($this->selectedFees)->sum(fn($fee) => $additionalFees[$fee] ?? 0);
+    $this->totalCost = $medicationTotal + $additionalTotal + $doctorPrescriptions + $costRoom;
+};
+
+$addMedication = function ($medicationId) {
+    $medication = Medication::find($medicationId);
+
+    Prescription::updateOrCreate(
+        [
+            'appointment_id' => $this->appointmentId,
+            'medication_id' => $medicationId,
+        ],
+        [
+            'qty' => DB::raw('qty + 1'),
+        ],
+    );
+
+    $this->dispatch('prescription-updated');
+};
+
+$increaseQty = function ($prescriptionId) {
+    $prescription = Prescription::find($prescriptionId);
+    $prescription->update(['qty' => $prescription->qty + 1]);
+    $this->dispatch('prescription-updated');
+};
+
+$decreaseQty = function ($prescriptionId) {
+    $prescription = Prescription::find($prescriptionId);
+    if ($prescription->qty > 1) {
+        $prescription->update(['qty' => $prescription->qty - 1]);
+        $this->dispatch('prescription-updated');
+    }
+};
+
+$deletePrescription = function ($prescriptionId) {
+    Prescription::find($prescriptionId)->delete();
+    $this->dispatch('prescription-updated');
+};
+
+$confirmPayment = function () {
+    $this->calculateTotalCost();
+    $this->alert('success', 'Pembayaran berhasil dikonfirmasi.', ['position' => 'center']);
+};
 
 mount(function ($paymentRecord) {
     $paymentRecordId = $paymentRecord->id;
@@ -34,61 +106,23 @@ mount(function ($paymentRecord) {
     }
 
     $this->medicalRecord = $this->paymentRecord->medicalRecord;
+    $this->appointmentId = $this->paymentRecord->medicalRecord->appointment->id;
+    $this->additionalFees = [
+        'administrasi' => 100000,
+        'konsultasi_dokter' => 30000,
+        'perawatan' => 20000,
+        'perawatan_khusus' => 30000,
+        'nutrisi' => 45000,
+    ];
     $this->medicines = $this->loadMedicines();
-    $this->totalCost = $this->calculateTotalCost();
+    $this->calculateTotalCost();
 });
 
 // Fungsi untuk memuat data resep
 $loadMedicines = function () {
     return Prescription::where('medical_record_id', $this->paymentRecord->medicalRecord->id)->get();
 };
-
-// Fungsi untuk menghitung total biaya
-$calculateTotalCost = function () {
-    $type = $this->medicalRecord->type;
-
-    // Biaya dasar
-    $administrationFee = 100000;
-    $consultationFee = 30000;
-    $roomFee = 50000;
-    $nursingCare = 20000;
-    $specialTreatment = 30000;
-    $infusionSet = 25000;
-    $infusionFluids = 35000;
-    $nutrition = 45000;
-    $laboratoryFee = 70000;
-
-    // Biaya tambahan yang dipilih oleh admin
-    $additionalFees = [
-        'administration' => $administrationFee,
-        'consultation' => $consultationFee,
-        'room' => $roomFee,
-        'nursing' => $nursingCare,
-        'special_treatment' => $specialTreatment,
-        'infusion_set' => $infusionSet,
-        'infusion_fluids' => $infusionFluids,
-        'nutrition' => $nutrition,
-        'laboratory' => $laboratoryFee,
-    ];
-
-    // Hitung total biaya berdasarkan pilihan admin
-    $subtotalNonMedicine = collect($this->selectedFees)
-        ->map(fn($fee) => $additionalFees[$fee] ?? 0)
-        ->sum();
-
-    // Tambahkan biaya obat-obatan
-    $medicineCost = $this->medicines->sum(fn($prescription) => $prescription->medication->price * $prescription->quantity);
-
-    return $subtotalNonMedicine + $medicineCost;
-};
-
-// Fungsi untuk konfirmasi pembayaran
-$confirmPayment = function () {
-    $this->totalCost = $this->calculateTotalCost();
-    $this->alert('success', 'Pembayaran berhasil dikonfirmasi.', ['position' => 'center']);
-};
 ?>
-
 
 <x-app-layout>
     @volt
@@ -99,10 +133,8 @@ $confirmPayment = function () {
             <li class="breadcrumb-item"><a href="#">{{ $medicalRecord->patient->name }}</a></li>
         </x-slot>
 
-
-
         <div>
-
+            {{ $appointmentId }}
             <div class="card">
                 <div class="card-body">
                     <div class="accordion" id="accordionExample">
@@ -110,9 +142,7 @@ $confirmPayment = function () {
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#administration" aria-expanded="false" aria-controls="administration">
-                                    <strong>
-                                        Data Pasien
-                                    </strong>
+                                    <strong>Data Pasien</strong>
                                 </button>
                             </h2>
                             <div id="administration" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
@@ -124,14 +154,11 @@ $confirmPayment = function () {
                             </div>
                         </div>
 
-
                         <div class="accordion-item">
                             <h2 class="accordion-header">
                                 <button class="accordion-button" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#administration" aria-expanded="true" aria-controls="administration">
-                                    <strong>
-                                        Administrasi
-                                    </strong>
+                                    <strong>Administrasi</strong>
                                 </button>
                             </h2>
                             <div id="administration" class="accordion-collapse collapse show"
@@ -144,60 +171,53 @@ $confirmPayment = function () {
                                     <div class="mb-4">
                                         <h6 class="fw-bolder">Biaya Tambahan:</h6>
                                         <div class="form-check">
-                                            <input type="checkbox" wire:model="selectedFees" value="administration"
-                                                class="form-check-input"> Administrasi (Rp 100.000)
+                                            <input type="checkbox" class="form-check-input" wire:change="calculateTotalCost"
+                                                {{ $medicalRecord->type === 'outpatient' ?: 'checked' }} disabled>
+                                            <div class="row">
+                                                <div class="col-md">
+                                                    Biaya Kamar
+                                                </div>
+                                                <div class="col-md text-end">
+                                                    {{ formatRupiah(50000) }}
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="form-check">
-                                            <input type="checkbox" wire:model="selectedFees" value="consultation"
-                                                class="form-check-input"> Konsultasi Dokter (Rp 30.000)
-                                        </div>
-                                        @if ($medicalRecord->type === 'rawat inap')
+                                        @foreach ($additionalFees as $fee => $amount)
                                             <div class="form-check">
-                                                <input type="checkbox" wire:model="selectedFees" value="room"
-                                                    class="form-check-input"> Biaya Kamar (Rp 50.000)
+                                                <input type="checkbox" wire:model.live="selectedFees"
+                                                    value="{{ $fee }}" class="form-check-input"
+                                                    wire:change="calculateTotalCost">
+
+                                                <div class="row">
+                                                    <div class="col-md">
+                                                        {{ ucwords(str_replace('_', ' ', $fee)) }}
+                                                    </div>
+                                                    <div class="col-md text-end">
+                                                        {{ formatRupiah($amount) }}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="form-check">
-                                                <input type="checkbox" wire:model="selectedFees" value="nursing"
-                                                    class="form-check-input"> Perawatan (Rp 20.000)
-                                            </div>
-                                            <div class="form-check">
-                                                <input type="checkbox" wire:model="selectedFees" value="special_treatment"
-                                                    class="form-check-input"> Perawatan Khusus (Rp 30.000)
-                                            </div>
-                                            <div class="form-check">
-                                                <input type="checkbox" wire:model="selectedFees" value="infusion_set"
-                                                    class="form-check-input"> Set Infus (Rp 25.000)
-                                            </div>
-                                            <div class="form-check">
-                                                <input type="checkbox" wire:model="selectedFees" value="infusion_fluids"
-                                                    class="form-check-input"> Cairan Infus (Rp 35.000)
-                                            </div>
-                                            <div class="form-check">
-                                                <input type="checkbox" wire:model="selectedFees" value="nutrition"
-                                                    class="form-check-input"> Nutrisi (Rp 45.000)
-                                            </div>
-                                            <div class="form-check">
-                                                <input type="checkbox" wire:model="selectedFees" value="laboratory"
-                                                    class="form-check-input"> Biaya Laboratorium (Rp 70.000)
-                                            </div>
-                                        @endif
+                                        @endforeach
                                     </div>
 
+                                    <div class="row fw-bolder">
+                                        <div class="col-md">
+                                            Total Biaya:
+                                        </div>
+                                        <div class="col-md text-end">
+                                            {{ formatRupiah($totalCost) }}
+                                        </div>
+                                    </div>
                                     <hr>
 
-                                    <h5>Total Biaya: Rp {{ formatRupiah($totalCost) }}</h5>
                                     <button class="btn btn-primary" wire:click="confirmPayment">Konfirmasi
                                         Pembayaran</button>
                                 </div>
                             </div>
                         </div>
-
                     </div>
-
                 </div>
             </div>
-
-
         </div>
     @endvolt
 </x-app-layout>

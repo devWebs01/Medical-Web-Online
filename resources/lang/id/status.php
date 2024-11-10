@@ -15,8 +15,12 @@ return [
     // InpatientRecord
     'outpatient' => 'Rawat Jalan',
     'inpatient' => 'Rawat Inap (One Day Care)',
+    'discharged' => 'Pulang',
+    'active' => 'Aktif',
 
     // payment
     'pending' => 'Belum Dibayar',
+    'unpaid' => 'Belum Dibayar',
+    'paid' => 'Lunas',
 
 ];

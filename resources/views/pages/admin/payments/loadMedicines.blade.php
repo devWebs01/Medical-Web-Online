@@ -35,7 +35,6 @@
                             $medicines->sum(function ($prescription) {
                                 return $prescription->medication->price * $prescription->quantity;
                             }),
-                            2,
                         ) }}
                     </td>
                 </tr>
