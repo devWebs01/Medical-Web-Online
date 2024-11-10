@@ -48,6 +48,7 @@
             </a>
         </li>
 
+        @if (Auth()->user()->role !== 'doctor')
         <li class="sidebar-item">
             <a class="sidebar-link" href="{{ route('paymentRecords.index') }}" aria-expanded="false">
                 <span>
@@ -57,7 +58,6 @@
             </a>
         </li>
 
-        @if (Auth()->user()->role !== 'doctor')
             <li class="nav-small-cap">
                 <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
                 <span class="hide-menu">Klinik</span>
