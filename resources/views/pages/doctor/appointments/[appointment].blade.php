@@ -55,6 +55,7 @@ $storeMedicalRecord = function () {
     if ($medicalRecord->exists) {
         $this->updateAppointmentStatus($this->appointment);
         $this->handleInpatientRecord($medicalRecord, $validateData);
+        $this->handleBookingRoom($medicalRecord);
     }
 
     $this->alert('success', 'Data pemeriksaan berhasil disimpan!', [
@@ -89,6 +90,12 @@ $handleInpatientRecord = function ($medicalRecord, $validateData) {
     }
 };
 
+$handleBookingRoom = function ($medicalRecord) {
+    if ($medicalRecord->type === 'inpatient') {
+        Room::find($this->room_id)->update(['availability' => 'occupied']);
+    }
+};
+
 mount(function () {
     if ($this->medicalRecord) {
         $this->loadInpatientData($this->medicalRecord);
@@ -97,7 +104,7 @@ mount(function () {
 });
 
 $loadInpatientData = function ($medicalRecord) {
-    $inpatientRecord = $medicalRecord->inpatientRecords->first();
+    $inpatientRecord = $medicalRecord->inpatientRecord;
     if ($inpatientRecord) {
         $this->room_id = $inpatientRecord->room_id;
         $this->admission_date = $inpatientRecord->admission_date;
@@ -129,147 +136,52 @@ $loadMedicalRecord = function ($medicalRecord) {
 
     @volt
         <div>
+
+
+
             <div class="card mb-3">
                 <div class="card-header">
                     <div class="alert alert-primary" role="alert">
                         <strong>Pemeriksaan - {{ $appointment->patient->name }}</strong>
                     </div>
                 </div>
-                @foreach ($errors->all() as $item)
-                    {{ $item }}
-                @endforeach
+
                 <div class="card-body">
-                    <form wire:submit="storeMedicalRecord">
-                        @csrf
+                    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {{ $medicalRecord ? 'active' : '' }}" id="pills-details-tab"
+                                data-bs-toggle="pill" data-bs-target="#pills-details" type="button" role="tab"
+                                aria-controls="pills-details" aria-selected="{{ $medicalRecord ? 'true' : 'false' }}">Data
+                                Pemeriksaan</button>
+                        </li>
 
-                        <div class="mb-3">
-                            <label for="physical_exam" class="form-label">Pemeriksaan Fisik</label>
-                            <textarea wire:model="physical_exam" class="form-control" name="physical_exam" id="physical_exam" rows="3"></textarea>
-                            @error('physical_exam')
-                                <small id="physical_exam" class="form-text text-danger">{{ $message }}</small>
-                            @enderror
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {{ !$medicalRecord ? 'active' : '' }}" id="pills-edit-tab"
+                                data-bs-toggle="pill" data-bs-target="#pills-edit" type="button" role="tab"
+                                aria-controls="pills-edit" aria-selected="{{ !$medicalRecord ? 'true' : 'false' }}">Form
+                                Input</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="pills-tabContent">
+                        <div class="tab-pane fade {{ $medicalRecord ? 'show active' : '' }}" id="pills-details"
+                            role="tabpanel" aria-labelledby="pills-details-tab" tabindex="0">
+                            @include('pages.doctor.appointments.checkUp')
                         </div>
 
-                        <div class="row">
-                            <div class="col-md">
-                                <div class="mb-3">
-                                    <label for="complaint" class="form-label">Keluhan Pasien</label>
-                                    <textarea wire:model="complaint" class="form-control" name="complaint" id="complaint" rows="3"></textarea>
-                                    @error('complaint')
-                                        <small id="complaint" class="form-text text-danger">{{ $message }}</small>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md">
-                                <div class="mb-3">
-                                    <label for="diagnosis" class="form-label">Diagnosa Pasien</label>
-                                    <textarea wire:model="diagnosis" class="form-control" name="diagnosis" id="diagnosis" rows="3"></textarea>
-                                    @error('diagnosis')
-                                        <small id="diagnosis" class="form-text text-danger">{{ $message }}</small>
-                                    @enderror
-                                </div>
-                            </div>
+                        <div class="tab-pane fade {{ !$medicalRecord ? 'show active' : '' }}" id="pills-edit"
+                            role="tabpanel" aria-labelledby="pills-edit-tab" tabindex="0">
+                            @include('pages.doctor.appointments.formMedicalRecord')
                         </div>
-
-                        <div class="mb-3">
-                            <label for="recommendation" class="form-label">Saran Perawatan atau Tindakan Lebih
-                                Lanjut</label>
-                            <textarea wire:model="recommendation" class="form-control" name="recommendation" id="recommendation" rows="3"></textarea>
-                            @error('recommendation')
-                                <small id="recommendation" class="form-text text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="type" class="form-label">Tipe Perawatan</label>
-                            <select class="form-select" wire:model.live="type" name="type" id="type">
-                                <option selected>Select one</option>
-                                <option value="outpatient">Rawat Jalan</option>
-                                <option value="inpatient">Rawat Inap (Care One Day)</option>
-                            </select>
-                            @error('type')
-                                <small id="type" class="form-text text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <div class="{{ $type == 'inpatient' ?: 'd-none' }}">
-
-                            <div class="alert alert-primary" role="alert">
-                                <p><strong>Rawat inap "Care One Day" (atau rawat inap singkat)</strong> adalah layanan
-                                    perawatan medis di
-                                    mana pasien tinggal di fasilitas kesehatan selama kurang dari 24 jam.
-                                </p>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="rooms" class="form-label">Pilih Kamar</label>
-
-                                @error('room_id')
-                                    <p id="room_id" class="form-text text-danger">{{ $message }}</p>
-                                @enderror
-
-                                <div class="row">
-                                    @foreach ($rooms as $room)
-                                        <div class="col-md">
-                                            <div class="form-check px-0">
-                                                <label class="form-check-label card"
-                                                    for="flexRadioDefault{{ $room->room_number }}">
-                                                    <div class="card-body">
-                                                        <div class="row align-items-center">
-                                                            <div class="col-auto px-5">
-                                                                <!-- Set nilai input radio sesuai ID room dan bind dengan Livewire -->
-                                                                <input class="form-check-input p-3 border border-primary"
-                                                                    type="radio" wire:model="room_id" name="room_id"
-                                                                    value="{{ $room->id }}"
-                                                                    id="flexRadioDefault{{ $room->room_number }}"
-                                                                    {{ $room_id == $room->id ? 'checked' : '' }}>
-                                                            </div>
-                                                            <div class="col-auto">
-                                                                <h5 class="fw-bold">
-                                                                    Kamar {{ $room->room_number }}
-                                                                </h5>
-                                                                <span
-                                                                    class="badge {{ $room->availability == 'available' ? 'bg-primary' : 'bg-danger' }}">
-                                                                    {{ __('room.' . $room->availability) }}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
+                    </div>
 
 
-                            </div>
 
-                            <div class="mb-3">
-                                <label for="doctor_notes" class="form-label">Catatan Dokter</label>
-                                <textarea class="form-control" name="doctor_notes" wire:model="doctor_notes" id="doctor_notes" rows="3">
-                                    {{ $doctor_notes }}
-                                </textarea>
-                            </div>
-
-
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ $medicalRecord ? 'Edit' : 'Submit' }}
-                                </button>
-                            </div>
-                            <div class="col-md align-self-center text-end">
-                                <span wire:loading class="spinner-border spinner-border-sm"></span>
-                            </div>
-                        </div>
-                    </form>
                 </div>
             </div>
 
             <div class="mb-3 {{ $medicalRecord != null ?: 'd-none' }}">
-                @include('pages.doctor.appointments.medicalRecord', [
+                @include('pages.doctor.appointments.prescription', [
                     'medicalRecord' => $medicalRecord,
                 ])
             </div>

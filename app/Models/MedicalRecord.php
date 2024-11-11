@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class MedicalRecord extends Model
 {
@@ -45,9 +46,9 @@ class MedicalRecord extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function inpatientRecords(): HasMany
+    public function inpatientRecord(): HasOne
     {
-        return $this->hasMany(InpatientRecord::class);
+        return $this->hasOne(InpatientRecord::class);
     }
 
     /**
@@ -60,8 +61,8 @@ class MedicalRecord extends Model
         return $this->belongsTo(Patient::class);
     }
 
-    public function paymentRecords(): HasMany
+    public function paymentRecord(): hasOne
     {
-        return $this->hasMany(PaymentRecord::class);
+        return $this->hasOne(PaymentRecord::class);
     }
 }

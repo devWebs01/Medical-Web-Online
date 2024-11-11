@@ -31,4 +31,8 @@ class PaymentRecord extends Model
             ->withPivot('quantity', 'price')
             ->withTimestamps();
     }
+    public function additionalFees(): BelongsToMany
+    {
+        return $this->belongsToMany(AdditionalFees::class, 'payment_additional_fee');
+    }
 }

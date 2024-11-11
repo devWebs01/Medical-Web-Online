@@ -48,15 +48,6 @@
             </a>
         </li>
 
-        <li class="sidebar-item">
-            <a class="sidebar-link" href="{{ route('inpatientRecords.index') }}" aria-expanded="false">
-                <span>
-                    <i class='fs-6 bx bx-plus'></i>
-                </span>
-                <span class="hide-menu">Rawat Inap</span>
-            </a>
-        </li>
-
         {{-- @if (Auth()->user()->role !== 'doctor') --}}
             <li class="sidebar-item">
                 <a class="sidebar-link" href="{{ route('paymentRecords.index') }}" aria-expanded="false">

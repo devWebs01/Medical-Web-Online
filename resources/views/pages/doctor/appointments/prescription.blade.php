@@ -265,7 +265,7 @@ $removeMedicine = function ($index) {
                                 <div class="col-auto">
                                     <div class="mb-3">
                                         <label for="quantity_{{ $index }}" class="form-label">Jumlah Obat</label>
-                                        <input type="text"
+                                        <input type="number"
                                             class="form-control @error('medicines.' . $index . '.quantity') is-invalid @enderror"
                                             wire:model="medicines.{{ $index }}.quantity"
                                             id="quantity_{{ $index }}" />
@@ -317,7 +317,7 @@ $removeMedicine = function ($index) {
                                     class="btn btn-primary
                                 {{-- {{ $role === 'doctor' ?: 'd-none' }} --}}
                                  ">
-                                    Simpan Resep & Lanjutkan
+                                    Submit
                                 </button>
                             </div>
                             <div class="col-auto align-self-center text-end">
