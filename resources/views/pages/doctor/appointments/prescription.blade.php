@@ -97,7 +97,6 @@ $saveMedicalRecord = function () {
     $this->redirectRoute('medicalRecords.index');
 };
 
-
 $storePrescriptions = function () {
     if (!$this->medicalRecord || !$this->medical_record_id) {
         $this->alert('error', 'Rekam medis tidak ditemukan!', [
@@ -210,7 +209,6 @@ $handlePaymentOnTypeChange = function () {
     }
 };
 
-
 $addMedicine = function () {
     $this->medicines[] = [
         'medicine_id' => '',
@@ -234,97 +232,136 @@ $removeMedicine = function ($index) {
                     <div class="alert alert-primary" role="alert">
                         <strong>Pengobatan dan Resep Obat</strong>
                     </div>
-                    <button type="button" wire:click="addMedicine" role="button" class="btn btn-outline-primary">
-                        Tambah Obat
-                    </button>
+
+                    @if (optional($medicalRecord)->paymentRecord == null)
+                        <button type="button" wire:click="addMedicine" role="button" class="btn btn-outline-primary">
+                            Tambah Obat
+                        </button>
+                    @endif
                 </div>
                 <div class="card-body">
-                    <form wire:submit.prevent="saveMedicalRecord">
-                        @csrf
 
-                        @foreach ($medicines as $index => $medicine)
+                    @if (optional($medicalRecord)->paymentRecord == null)
+                        <form wire:submit.prevent="saveMedicalRecord">
+                            @csrf
+
+                            @foreach ($medicines as $index => $medicine)
+                                <div class="row mb-3">
+                                    <div class="col-auto">
+                                        <div class="mb-3">
+                                            <label for="medicine_id_{{ $index }}" class="form-label">Obat</label>
+                                            <select
+                                                class="form-select @error('medicines.' . $index . '.medicine_id') is-invalid @enderror"
+                                                wire:model="medicines.{{ $index }}.medicine_id"
+                                                id="medicine_id_{{ $index }}">
+                                                <option value="">Pilih Obat</option>
+                                                @foreach ($medications as $medication)
+                                                    <option value="{{ $medication->id }}">{{ $medication->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('medicines.' . $index . '.medicine_id')
+                                                <small class="form-text text-danger">{{ $message }}</small>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="mb-3">
+                                            <label for="quantity_{{ $index }}" class="form-label">Jumlah Obat</label>
+                                            <input type="number"
+                                                class="form-control @error('medicines.' . $index . '.quantity') is-invalid @enderror"
+                                                wire:model="medicines.{{ $index }}.quantity"
+                                                id="quantity_{{ $index }}" />
+                                            @error('medicines.' . $index . '.quantity')
+                                                <small class="form-text text-danger">{{ $message }}</small>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="mb-3">
+                                            <label for="frequency_{{ $index }}" class="form-label">Frekuensi</label>
+                                            <input type="text"
+                                                class="form-control @error('medicines.' . $index . '.frequency') is-invalid @enderror"
+                                                wire:model="medicines.{{ $index }}.frequency"
+                                                id="frequency_{{ $index }}" />
+                                            @error('medicines.' . $index . '.frequency')
+                                                <small class="form-text text-danger">{{ $message }}</small>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="mb-3">
+                                            <label for="duration_{{ $index }}" class="form-label">Durasi</label>
+                                            <input type="text"
+                                                class="form-control @error('medicines.' . $index . '.duration') is-invalid @enderror"
+                                                wire:model="medicines.{{ $index }}.duration"
+                                                id="duration_{{ $index }}" />
+                                            @error('medicines.' . $index . '.duration')
+                                                <small class="form-text text-danger">{{ $message }}</small>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="mb-3">
+                                            <p class="form-label text-white">Hapus</p>
+
+                                            <button type="button" wire:click="removeMedicine({{ $index }})"
+                                                class="btn btn-danger">
+                                                Hapus
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+
                             <div class="row mb-3">
                                 <div class="col-auto">
-                                    <div class="mb-3">
-                                        <label for="medicine_id_{{ $index }}" class="form-label">Obat</label>
-                                        <select
-                                            class="form-select @error('medicines.' . $index . '.medicine_id') is-invalid @enderror"
-                                            wire:model="medicines.{{ $index }}.medicine_id"
-                                            id="medicine_id_{{ $index }}">
-                                            <option value="">Pilih Obat</option>
-                                            @foreach ($medications as $medication)
-                                                <option value="{{ $medication->id }}">{{ $medication->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @error('medicines.' . $index . '.medicine_id')
-                                            <small class="form-text text-danger">{{ $message }}</small>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-auto">
-                                    <div class="mb-3">
-                                        <label for="quantity_{{ $index }}" class="form-label">Jumlah Obat</label>
-                                        <input type="number"
-                                            class="form-control @error('medicines.' . $index . '.quantity') is-invalid @enderror"
-                                            wire:model="medicines.{{ $index }}.quantity"
-                                            id="quantity_{{ $index }}" />
-                                        @error('medicines.' . $index . '.quantity')
-                                            <small class="form-text text-danger">{{ $message }}</small>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-auto">
-                                    <div class="mb-3">
-                                        <label for="frequency_{{ $index }}" class="form-label">Frekuensi</label>
-                                        <input type="text"
-                                            class="form-control @error('medicines.' . $index . '.frequency') is-invalid @enderror"
-                                            wire:model="medicines.{{ $index }}.frequency"
-                                            id="frequency_{{ $index }}" />
-                                        @error('medicines.' . $index . '.frequency')
-                                            <small class="form-text text-danger">{{ $message }}</small>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-auto">
-                                    <div class="mb-3">
-                                        <label for="duration_{{ $index }}" class="form-label">Durasi</label>
-                                        <input type="text"
-                                            class="form-control @error('medicines.' . $index . '.duration') is-invalid @enderror"
-                                            wire:model="medicines.{{ $index }}.duration"
-                                            id="duration_{{ $index }}" />
-                                        @error('medicines.' . $index . '.duration')
-                                            <small class="form-text text-danger">{{ $message }}</small>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-auto">
-                                    <div class="mb-3">
-                                        <p class="form-label text-white">Hapus</p>
-
-                                        <button type="button" wire:click="removeMedicine({{ $index }})"
-                                            class="btn btn-danger">
-                                            Hapus
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-
-                        <div class="row mb-3">
-                            <div class="col-auto">
-                                <button type="submit"
-                                    class="btn btn-primary
-                                {{-- {{ $role === 'doctor' ?: 'd-none' }} --}}
+                                    <button type="submit"
+                                        class="btn btn-primary
+                                {{ $role === 'doctor' ?: 'd-none' }}
                                  ">
-                                    Submit
-                                </button>
+                                        Submit
+                                    </button>
+                                </div>
+                                <div class="col-auto align-self-center text-end">
+                                    <span wire:loading class="spinner-border spinner-border-sm"></span>
+                                </div>
                             </div>
-                            <div class="col-auto align-self-center text-end">
-                                <span wire:loading class="spinner-border spinner-border-sm"></span>
+                        </form>
+                    @else
+                        <div>
+                            <div class="table-responsive pt-0">
+                                <h6 class="fw-bolder mb-3">Resep Obat Dokter</h6>
+                                <table class="table table-borderless text-center ">
+                                    <thead>
+                                        <tr class="border">
+                                            <th>#</th>
+                                            <th>Nama Obat</th>
+                                            <th>Durasi</th>
+                                            <th>Frekuensi</th>
+                                            <th>Jumlah</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($medicalRecord->prescriptions as $no => $prescription)
+                                            <tr class="border">
+                                                <td>{{ ++$no }}</td>
+                                                <td>{{ $prescription->medication->name }}</td>
+                                                <td>{{ $prescription->duration }}</td>
+                                                <td>{{ $prescription->frequency }}</td>
+                                                <td>{{ $prescription->quantity }}</td>
+
+                                            </tr>
+                                        @endforeach
+
+
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                    </form>
+                    @endif
+
                 </div>
             </div>
         </div>

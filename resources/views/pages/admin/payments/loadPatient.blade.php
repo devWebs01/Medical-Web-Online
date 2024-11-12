@@ -41,7 +41,7 @@
         </p>
         <p><strong>Status:</strong>
             <br>
-            {{ $medicalRecord->status }}
+            {{ __('status.' . $medicalRecord->status) }}
         </p>
         <p><strong>Tanggal Dibuat:</strong>
             <br>

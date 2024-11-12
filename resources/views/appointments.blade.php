@@ -23,7 +23,7 @@
             </li>
         </ul>
         <div class="tab-content" id="pills-tabContent">
-            <!-- Tab untuk Janji Temu Hari Ini -->
+            <!-- Tab untuk Antrian Hari Ini -->
             <div class="tab-pane fade show active" id="pills-todayAppointments" role="tabpanel"
                 aria-labelledby="pills-todayAppointments-tab">
                 <div class="card-body">
@@ -49,17 +49,19 @@
                                                 class="badge p-2 bg-warning">{{ __('status.' . $appointment->status) }}</span>
                                         </td>
                                         <td>
-                                            <a class="btn btn-primary btn-sm
-                                            {{-- {{ Auth()->user()->role === 'doctor' ?: 'd-none' }} --}}
+                                            <div class="d-flex gap-3">
+                                                <a class="btn btn-primary btn-sm
+                                            {{ Auth()->user()->role === 'doctor' ?: 'd-none' }}
                                              "
-                                                href="{{ route('appointments.patient', ['appointment' => $appointment->id]) }}"
-                                                role="button">Tindakan</a>
-                                            <button wire:loading.attr='disabled'
-                                                wire:click='cancelAppointment({{ $appointment->id }})'
-                                                wire:confirm="Apakah kamu yakin ingin membatalkan janji temu ini?"
-                                                class="btn btn-sm btn-danger {{ $role === 'admin' ?: 'd-none' }} {{ $appointment->status === 'waiting' ? '' : 'd-none' }}">
-                                                Batalkan
-                                            </button>
+                                                    href="{{ route('appointments.patient', ['appointment' => $appointment->id]) }}"
+                                                    role="button">Tindakan</a>
+                                                <button wire:loading.attr='disabled'
+                                                    wire:click='cancelAppointment({{ $appointment->id }})'
+                                                    wire:confirm="Apakah kamu yakin ingin membatalkan Antrian ini?"
+                                                    class="btn btn-sm btn-danger {{ $role === 'admin' ?: 'd-none' }} {{ $appointment->status === 'waiting' ? '' : 'd-none' }}">
+                                                    Batalkan
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -69,7 +71,7 @@
                 </div>
             </div>
 
-            <!-- Tab untuk Janji Temu Selesai -->
+            <!-- Tab untuk Antrian Selesai -->
             <div class="tab-pane fade" id="pills-completedAppointments" role="tabpanel"
                 aria-labelledby="pills-completedAppointments-tab">
                 <div class="card-body">
@@ -107,7 +109,7 @@
                 </div>
             </div>
 
-            <!-- Tab untuk Janji Temu Selesai -->
+            <!-- Tab untuk Antrian Selesai -->
             <div class="tab-pane fade" id="pills-canceledAppointments" role="tabpanel"
                 aria-labelledby="pills-canceledAppointments-tab">
                 <div class="card-body">

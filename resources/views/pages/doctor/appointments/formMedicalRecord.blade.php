@@ -108,14 +108,16 @@
 
     </div>
 
-    <div class="row mb-3">
-        <div class="col-md">
-            <button type="submit" class="btn btn-primary">
-                {{ $medicalRecord ? 'Edit' : 'Submit' }}
-            </button>
+    @if (optional($medicalRecord)->paymentRecord == null)
+        <div class="row mb-3">
+            <div class="col-md">
+                <button type="submit" class="btn btn-primary">
+                    {{ $medicalRecord ? 'Edit' : 'Submit' }}
+                </button>
+            </div>
+            <div class="col-md align-self-center text-end">
+                <span wire:loading class="spinner-border spinner-border-sm"></span>
+            </div>
         </div>
-        <div class="col-md align-self-center text-end">
-            <span wire:loading class="spinner-border spinner-border-sm"></span>
-        </div>
-    </div>
+    @endif
 </form>

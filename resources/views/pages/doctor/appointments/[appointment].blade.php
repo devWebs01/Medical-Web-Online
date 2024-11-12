@@ -41,7 +41,7 @@ rules([
     'physical_exam' => 'nullable|string|max:255',
     'recommendation' => 'nullable|string|max:255',
     'type' => 'required|in:outpatient,inpatient',
-    'room_id' => 'required|exists:rooms,id',
+    'room_id' => 'nullable|exists:rooms,id',
     'doctor_notes' => 'nullable|string',
 ]);
 
@@ -49,6 +49,18 @@ $storeMedicalRecord = function () {
     $validateData = $this->validate();
     $validateData['patient_id'] = $this->appointment->patient_id;
     $validateData['appointment_id'] = $this->appointment->id;
+
+    if ($this->type === 'inpatient') {
+        $this->alert('error', 'Pilih kamar pasien yang diinginkan', [
+            'position' => 'top',
+            'timer' => 3000,
+            'toast' => true,
+        ]);
+
+        $this->validate([
+            'room_id' => 'required|exists:rooms,id',
+        ]);
+    }
 
     $medicalRecord = MedicalRecord::updateOrCreate(['appointment_id' => $validateData['appointment_id']], $validateData);
 
@@ -136,9 +148,6 @@ $loadMedicalRecord = function ($medicalRecord) {
 
     @volt
         <div>
-
-
-
             <div class="card mb-3">
                 <div class="card-header">
                     <div class="alert alert-primary" role="alert">
@@ -148,12 +157,15 @@ $loadMedicalRecord = function ($medicalRecord) {
 
                 <div class="card-body">
                     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link {{ $medicalRecord ? 'active' : '' }}" id="pills-details-tab"
-                                data-bs-toggle="pill" data-bs-target="#pills-details" type="button" role="tab"
-                                aria-controls="pills-details" aria-selected="{{ $medicalRecord ? 'true' : 'false' }}">Data
-                                Pemeriksaan</button>
-                        </li>
+                        @if ($medicalRecord)
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link {{ $medicalRecord ? 'active' : '' }}" id="pills-details-tab"
+                                    data-bs-toggle="pill" data-bs-target="#pills-details" type="button" role="tab"
+                                    aria-controls="pills-details"
+                                    aria-selected="{{ $medicalRecord ? 'true' : 'false' }}">Data
+                                    Pemeriksaan</button>
+                            </li>
+                        @endif
 
                         <li class="nav-item" role="presentation">
                             <button class="nav-link {{ !$medicalRecord ? 'active' : '' }}" id="pills-edit-tab"
@@ -164,10 +176,12 @@ $loadMedicalRecord = function ($medicalRecord) {
                     </ul>
 
                     <div class="tab-content" id="pills-tabContent">
-                        <div class="tab-pane fade {{ $medicalRecord ? 'show active' : '' }}" id="pills-details"
-                            role="tabpanel" aria-labelledby="pills-details-tab" tabindex="0">
-                            @include('pages.doctor.appointments.checkUp')
-                        </div>
+                        @if ($medicalRecord)
+                            <div class="tab-pane fade {{ $medicalRecord ? 'show active' : '' }}" id="pills-details"
+                                role="tabpanel" aria-labelledby="pills-details-tab" tabindex="0">
+                                @include('pages.doctor.appointments.checkUp')
+                            </div>
+                        @endif
 
                         <div class="tab-pane fade {{ !$medicalRecord ? 'show active' : '' }}" id="pills-edit"
                             role="tabpanel" aria-labelledby="pills-edit-tab" tabindex="0">
@@ -181,6 +195,9 @@ $loadMedicalRecord = function ($medicalRecord) {
             </div>
 
             <div class="mb-3 {{ $medicalRecord != null ?: 'd-none' }}">
+
+               
+
                 @include('pages.doctor.appointments.prescription', [
                     'medicalRecord' => $medicalRecord,
                 ])

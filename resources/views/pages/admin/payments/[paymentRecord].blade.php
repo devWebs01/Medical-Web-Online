@@ -80,6 +80,10 @@ mount(function ($paymentRecord) {
     $this->medicalRecord = $this->paymentRecord->medicalRecord;
     $this->appointmentId = $this->paymentRecord->medicalRecord->appointment->id;
     $this->medicines = $this->loadMedicines();
+
+    // Inisialisasi selectedFees dengan data yang sudah tersimpan
+    $this->selectedFees = $this->paymentRecord->additionalFees->pluck('id')->toArray();
+
     $this->calculateTotalCost();
 });
 
@@ -94,7 +98,7 @@ $loadMedicines = function () {
         <x-slot name="title">Pembayaran {{ $medicalRecord->patient->name }}</x-slot>
         <x-slot name="header">
             <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('paymentRecords.index') }}">paymentRecord</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('paymentRecords.index') }}">Pembayaran</a></li>
             <li class="breadcrumb-item"><a href="#">{{ $medicalRecord->patient->name }}</a></li>
         </x-slot>
 
@@ -107,6 +111,8 @@ $loadMedicines = function () {
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#administration" aria-expanded="false" aria-controls="administration">
                                     <strong>Data Pasien</strong>
+                                    <span
+                                        class=" ms-3 badge text-bg-primary fs-1">{{ __('status.' . $medicalRecord->type) }}</span>
                                 </button>
                             </h2>
                             <div id="administration" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
@@ -138,7 +144,8 @@ $loadMedicines = function () {
                                             <div class="form-check">
                                                 <input type="checkbox" wire:model.live="selectedFees"
                                                     value="{{ $fee->id }}" class="form-check-input"
-                                                    wire:change="calculateTotalCost">
+                                                    wire:change="calculateTotalCost"
+                                                    {{ $paymentRecord->status === 'unpaid' ?: 'disabled' }}>
                                                 <div class="row">
                                                     <div class="col-md">{{ $fee->name }}</div>
                                                     <div class="col-md text-end">{{ formatRupiah($fee->cost) }}</div>

@@ -17,10 +17,10 @@ state(['PaymentRecords' => fn() => PaymentRecord::query()->latest()->get()]);
     @include('layouts.table')
 
     <div>
-        <x-slot name="title">Data PaymentRecord</x-slot>
+        <x-slot name="title">Data Pembayaran Rekam Medis</x-slot>
         <x-slot name="header">
             <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('paymentRecords.index') }}">PaymentRecord</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('paymentRecords.index') }}">Pembayaran</a></li>
         </x-slot>
 
         @volt

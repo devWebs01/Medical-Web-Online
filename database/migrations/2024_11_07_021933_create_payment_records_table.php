@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('payment_records', function (Blueprint $table) {
             $table->id();
+            $table->string('invoice')->unique(); // Tambahan kolom noinvoice
             $table->foreignId('medical_record_id')->constrained()->onDelete('cascade');
             $table->string('total_amount');
             $table->date('payment_date');

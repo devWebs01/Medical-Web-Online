@@ -18,7 +18,30 @@ class PaymentRecord extends Model
         'total_amount',
         'payment_date',
         'status',
+        'invoice',
     ];
+
+     /**
+     * Boot method untuk membuat invoice otomatis.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($paymentRecord) {
+            $paymentRecord->invoice = self::generateInvoiceNumber();
+        });
+    }
+
+    /**
+     * Generate nomor invoice secara otomatis.
+     */
+    public static function generateInvoiceNumber()
+    {
+        $latestInvoice = self::latest()->first();
+        $nextNumber = $latestInvoice ? intval(substr($latestInvoice->invoice, -4)) + 1 : 1;
+        return 'INV-' . date('Y') . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+    }
 
     public function medicalRecord(): BelongsTo
     {

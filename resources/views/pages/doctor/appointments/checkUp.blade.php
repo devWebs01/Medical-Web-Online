@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\InpatientRecord;
+use App\Models\MedicalRecord;
 use App\Models\Prescription;
 use App\Models\Medication;
 use App\Models\PaymentRecord;
@@ -15,6 +16,8 @@ state(['medicalRecord', 'inpatientRecordId']);
 
 $dischargePatient = function ($inpatientRecordId) {
     // Temukan InpatientRecord berdasarkan ID
+
+    $medicalRecord = MedicalRecord::find($this->medicalRecord->id);
     $inpatientRecord = InpatientRecord::find($inpatientRecordId);
 
     if (!$inpatientRecord) {
@@ -25,6 +28,8 @@ $dischargePatient = function ($inpatientRecordId) {
         ]);
         return;
     }
+
+    $medicalRecord->update(['status' => 'completed']);
 
     // Update status menjadi 'discharged'
     $inpatientRecord->update(['status' => 'discharged']);
@@ -48,13 +53,15 @@ $dischargePatient = function ($inpatientRecordId) {
         }
     }
 
-    // Buat entri PaymentRecord
-    $paymentRecord = PaymentRecord::create([
-        'medical_record_id' => $inpatientRecord->medical_record_id,
-        'total_amount' => $totalAmount,
-        'payment_date' => now(),
-        'status' => 'unpaid',
-    ]);
+    // Buat entri PaymentRecord dengan benar
+    $paymentRecord = PaymentRecord::updateOrCreate(
+        ['medical_record_id' => $inpatientRecord->medical_record_id],
+        [
+            'total_amount' => $totalAmount,
+            'payment_date' => now(),
+            'status' => 'unpaid',
+        ],
+    );
 
     // Mengaitkan obat-obatan dengan entri pembayaran
     foreach ($medicationsData as $data) {
@@ -70,9 +77,6 @@ $dischargePatient = function ($inpatientRecordId) {
         'timer' => 3000,
         'toast' => true,
     ]);
-
-    // Refresh data
-    $this->inpatientRecords = InpatientRecord::query()->latest()->get();
 
     $this->redirectRoute('medicalRecords.index');
 };
@@ -130,8 +134,10 @@ $dischargePatient = function ($inpatientRecordId) {
                     <p>{{ $medicalRecord->doctor_notes ?? '-' }}</p>
                 </div>
 
+                
                 <div class="col-md-12 text-end">
-                    <button class="btn btn-danger" wire:click="dischargePatient({{ $medicalRecord->inpatientRecord->id }})">
+                    <button class="btn btn-danger {{ $medicalRecord->status !== 'completed' ?: 'd-none' }}"
+                        wire:click="dischargePatient({{ $medicalRecord->inpatientRecord->id }})">
                         Pulangkan Pasien
                     </button>
                 </div>
