@@ -1,16 +1,16 @@
 <?php
 
-use App\Models\Appointment;
+use App\Models\PaymentRecord;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use function Laravel\Folio\name;
 use function Livewire\Volt\{computed, state, usesPagination, uses};
 
 uses([LivewireAlert::class]);
 
-name('reports.appointments');
+name('reports.paymentRecords');
 
 state([
-    'appointments' => fn () => Appointment::query()->latest()->get(),
+    'paymentRecords' => fn () => PaymentRecord::query()->latest()->get(),
 ]);
 ?>
 
@@ -34,21 +34,23 @@ state([
                                 <thead>
                                     <tr>
                                         <th>No.</th>
-                                        <th>Dokter</th>
-                                        <th>Pasien</th>
+                                        <th>Nama Pasien</th>
+                                        <th>Total</th>
                                         <th>Status</th>
+                                        <th>Tanggal</th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($appointments as $no => $appointment)
+                                    @foreach ($paymentRecords as $no => $paymentRecord)
                                         <tr>
                                             <td>{{ ++$no }}</td>
-                                            <td>{{ $appointment->doctor->name }}</td>
-                                            <td>{{ $appointment->patient->name }}</td>
-                                            <td>
-                                                <span
-                                                    class="badge p-2 bg-primary">{{ __('status.' . $appointment->status) }}</span>
+                                            <td>{{ $paymentRecord->medicalRecord->patient->name }}</td>
+                                            <td>{{ formatRupiah($paymentRecord->total_amount) }}</td>
+                                            <td>{{ __('status.' . $paymentRecord->status) }}</td>
+                                            <td>{{ Carbon\carbon::parse($paymentRecord->payment_date)->format('d M Y') }}
                                             </td>
+                                            
                                         </tr>
                                     @endforeach
 

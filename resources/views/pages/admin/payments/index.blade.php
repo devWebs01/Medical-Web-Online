@@ -9,7 +9,7 @@ uses([LivewireAlert::class]);
 
 name('paymentRecords.index');
 
-state(['PaymentRecords' => fn() => PaymentRecord::query()->latest()->get()]);
+state(['paymentRecords' => fn() => PaymentRecord::query()->latest()->get()]);
 
 ?>
 
@@ -41,7 +41,7 @@ state(['PaymentRecords' => fn() => PaymentRecord::query()->latest()->get()]);
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($PaymentRecords as $no => $paymentRecord)
+                                    @foreach ($paymentRecords as $no => $paymentRecord)
                                         <tr>
                                             <td>{{ ++$no }}</td>
                                             <td>{{ $paymentRecord->medicalRecord->patient->name }}</td>

@@ -1,16 +1,16 @@
 <?php
 
-use App\Models\Appointment;
+use App\Models\MedicalRecord;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use function Laravel\Folio\name;
 use function Livewire\Volt\{computed, state, usesPagination, uses};
 
 uses([LivewireAlert::class]);
 
-name('reports.appointments');
+name('reports.medicalRecords');
 
 state([
-    'appointments' => fn () => Appointment::query()->latest()->get(),
+    'medicalRecords' => fn() => MedicalRecord::query()->latest()->get(),
 ]);
 ?>
 
@@ -18,10 +18,10 @@ state([
     <div>
         @include('layouts.table-print')
 
-        <x-slot name="title">Data Antrian Pasien</x-slot>
+        <x-slot name="title">Data Rekam Medis</x-slot>
         <x-slot name="header">
             <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
-            <li class="breadcrumb-item"><a href="#">Antrian Pasien</a></li>
+            <li class="breadcrumb-item"><a href="#">Rekam Medis</a></li>
         </x-slot>
 
         @volt
@@ -34,25 +34,29 @@ state([
                                 <thead>
                                     <tr>
                                         <th>No.</th>
-                                        <th>Dokter</th>
                                         <th>Pasien</th>
                                         <th>Status</th>
+                                        <th>Type</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($appointments as $no => $appointment)
+                                    @foreach ($medicalRecords as $no => $item)
                                         <tr>
                                             <td>{{ ++$no }}</td>
-                                            <td>{{ $appointment->doctor->name }}</td>
-                                            <td>{{ $appointment->patient->name }}</td>
+                                            <td>{{ $item->appointment->patient->name }}</td>
                                             <td>
-                                                <span
-                                                    class="badge p-2 bg-primary">{{ __('status.' . $appointment->status) }}</span>
+                                                <span class="badge p-2 bg-primary">
+                                                    {{ __('status.' . $item->status) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {{ __('status.' . $item->type) }}
                                             </td>
                                         </tr>
                                     @endforeach
 
                                 </tbody>
+
                             </table>
                         </div>
 
