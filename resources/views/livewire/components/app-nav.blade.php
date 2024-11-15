@@ -37,17 +37,17 @@ $paymentUnpaid = computed(function () {
                     <span class="hide-menu">Manajemen Data </span>
                 </li>
 
+                <li class="sidebar-item {{ Auth()->user()->role === 'owner' ?: 'd-none' }}">
+                    <a class="sidebar-link position-relative" href="{{ route('users.index') }}" aria-expanded="false">
+                        <span>
+                            <i class='fs-6 bx bx-user-circle'></i>
+                        </span>
+                        <span class="hide-menu">Akun Pengguna</span>
+
+                    </a>
+                </li>
+
                 @if (Auth()->user()->role !== 'doctor')
-                    <li class="sidebar-item">
-                        <a class="sidebar-link position-relative" href="{{ route('users.index') }}" aria-expanded="false">
-                            <span>
-                                <i class='fs-6 bx bx-user-circle'></i>
-                            </span>
-                            <span class="hide-menu">Akun Pengguna</span>
-
-                        </a>
-                    </li>
-
                     <li class="sidebar-item">
                         <a class="sidebar-link position-relative" href="{{ route('patients.index') }}"
                             aria-expanded="false">
@@ -108,17 +108,16 @@ $paymentUnpaid = computed(function () {
                             <span class="hide-menu">Kamar</span>
                         </a>
                     </li>
-
-                    <li class="sidebar-item">
-                        <a class="sidebar-link position-relative" href="{{ route('settings.index') }}"
-                            aria-expanded="false">
-                            <span>
-                                <i class='fs-6 bx bx-cog'></i>
-                            </span>
-                            <span class="hide-menu">Pengaturan</span>
-                        </a>
-                    </li>
                 @endif
+
+                <li class="sidebar-item {{ Auth()->user()->role === 'owner' ?: 'd-none' }}">
+                    <a class="sidebar-link position-relative" href="{{ route('settings.index') }}" aria-expanded="false">
+                        <span>
+                            <i class='fs-6 bx bx-cog'></i>
+                        </span>
+                        <span class="hide-menu">Pengaturan</span>
+                    </a>
+                </li>
 
                 <li class="nav-small-cap">
                     <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
@@ -126,27 +125,40 @@ $paymentUnpaid = computed(function () {
                 </li>
 
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{ route('reports.appointments') }}" aria-expanded="false">
+                    <a class="sidebar-link" href="#" aria-expanded="false" data-bs-toggle="collapse"
+                        data-bs-target="#reportsDropdown">
                         <span>
-                            <i class='fs-6 bx bxs-calendar-plus'></i>
+                            <i class='fs-6 bx bxs-report'></i>
                         </span>
-                        <span class="hide-menu">Antrian Pasien</span>
+                        <span class="hide-menu">Laporan</span>
                     </a>
-                    <a class="sidebar-link" href="{{ route('reports.medicalRecords') }}" aria-expanded="false">
-                        <span>
-                            <i class='fs-6 bx bxs-calendar'></i>
-                        </span>
-                        <span class="hide-menu">Rekam Medis</span>
-                    </a>
-                    <a class="sidebar-link" href="{{ route('reports.paymentRecords') }}" aria-expanded="false">
-                        <span>
-                            <i class='fs-6 bx bx-money'></i>
-                        </span>
-                        <span class="hide-menu">Pembayaran</span>
-                    </a>
+                    <ul id="reportsDropdown" class="collapse">
+                        <li>
+                            <a class="sidebar-link" href="{{ route('reports.appointments') }}">
+                                <span>
+                                    <i class='fs-6 bx bxs-calendar-plus'></i>
+                                </span>
+                                <span class="hide-menu">Antrian Pasien</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="sidebar-link" href="{{ route('reports.medicalRecords') }}">
+                                <span>
+                                    <i class='fs-6 bx bxs-calendar'></i>
+                                </span>
+                                <span class="hide-menu">Rekam Medis</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="sidebar-link" href="{{ route('reports.paymentRecords') }}">
+                                <span>
+                                    <i class='fs-6 bx bx-money'></i>
+                                </span>
+                                <span class="hide-menu">Pembayaran</span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
-
-
             </ul>
         </nav>
         <!-- End Sidebar navigation -->

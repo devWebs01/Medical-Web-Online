@@ -75,8 +75,8 @@ $destroy = function (User $user) {
                                         <th>No.</th>
                                         <th>Nama</th>
                                         <th>Email</th>
-                                        <th>Telp</th>
                                         <th>Role</th>
+                                        <th>Telp</th>
                                         <th>Opsi</th>
                                     </tr>
                                 </thead>

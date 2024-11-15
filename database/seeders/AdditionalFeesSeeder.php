@@ -14,7 +14,7 @@ class AdditionalFeesSeeder extends Seeder
     public function run(): void
     {
         $fees = [
-            ['name' => 'Administrasi', 'cost' => 100000],
+            ['name' => 'Administrasi', 'cost' => 50000],
             ['name' => 'Konsultasi Dokter', 'cost' => 30000],
             ['name' => 'Perawatan', 'cost' => 20000],
             ['name' => 'Perawatan Khusus', 'cost' => 30000],

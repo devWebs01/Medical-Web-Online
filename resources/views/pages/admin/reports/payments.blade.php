@@ -10,7 +10,7 @@ uses([LivewireAlert::class]);
 name('reports.paymentRecords');
 
 state([
-    'paymentRecords' => fn () => PaymentRecord::query()->latest()->get(),
+    'paymentRecords' => fn() => PaymentRecord::query()->latest()->get(),
 ]);
 ?>
 
@@ -18,10 +18,10 @@ state([
     <div>
         @include('layouts.table-print')
 
-        <x-slot name="title">Data Antrian Pasien</x-slot>
+        <x-slot name="title">Data Pembayaran</x-slot>
         <x-slot name="header">
             <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
-            <li class="breadcrumb-item"><a href="#">Antrian Pasien</a></li>
+            <li class="breadcrumb-item"><a href="#">Pembayaran</a></li>
         </x-slot>
 
         @volt
@@ -50,7 +50,7 @@ state([
                                             <td>{{ __('status.' . $paymentRecord->status) }}</td>
                                             <td>{{ Carbon\carbon::parse($paymentRecord->payment_date)->format('d M Y') }}
                                             </td>
-                                            
+
                                         </tr>
                                     @endforeach
 

@@ -9,20 +9,19 @@ uses([LivewireAlert::class]);
 
 name('users.create');
 
-state(['name', 'email', 'password', 'telp']);
+state(['name', 'email', 'password', 'telp', 'role']);
 
 rules([
     'name' => 'required|min:5',
     'email' => 'required|min:5|unique:users,email',
     'password' => 'required|min:5',
     'telp' => 'required|unique:users,telp,id|digits_between:11,13',
+    'role' => 'required|in:admin,doctor,owner',
 ]);
 
 $create = function () {
     $validateData = $this->validate();
     User::create($validateData);
-
-    $this->reset('name', 'email', 'password', 'telp');
 
     $this->alert('success', 'Data klinik berhasil ditambahkan!', [
         'position' => 'top',
@@ -35,11 +34,11 @@ $create = function () {
 
 ?>
 <x-app-layout>
-    <x-slot name="title">Tambah Admin Baru</x-slot>
+    <x-slot name="title">Tambah Pengguna Baru</x-slot>
     <x-slot name="header">
         <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('users.index') }}">Admin</a></li>
-        <li class="breadcrumb-item"><a href="#">Tambah Admin</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('users.index') }}">Pengguna</a></li>
+        <li class="breadcrumb-item"><a href="#">Tambah Pengguna</a></li>
     </x-slot>
 
     @volt
@@ -107,6 +106,17 @@ $create = function () {
                                 </div>
                             </div>
                         </div>
+
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Role</label>
+                            <select class="form-select" wire:model='role' name="role" id="role">
+                                <option selected>Select one</option>
+                                <option value="admin">Admin</option>
+                                <option value="doctor">Dokter</option>
+                                <option value="owner">Pemilik</option>
+                            </select>
+                        </div>
+
                         <div class="row mb-3">
                             <div class="col-md">
                                 <button type="submit" class="btn btn-primary">

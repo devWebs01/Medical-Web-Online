@@ -8,15 +8,14 @@ use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 uses([LivewireAlert::class]);
 
-name('users.edit');
+name('profile.users');
 
 state([
+    'user' => fn() => Auth()->user(),
     'name' => fn() => $this->user->name,
     'email' => fn() => $this->user->email,
-    'telp' => fn() => $this->user->telp,
-    'role' => fn() => $this->user->role,
     'password',
-    'user',
+    'telp' => fn() => $this->user->telp,
 ]);
 
 $edit = function () {
@@ -27,7 +26,6 @@ $edit = function () {
         'email' => 'required|min:5|' . Rule::unique(User::class)->ignore($user->id),
         'password' => 'min:5|nullable',
         'telp' => 'required|digits_between:11,12|' . Rule::unique(User::class)->ignore($user->id),
-        'role' => 'required|in:admin,doctor,owner',
     ]);
 
     $user = $this->user;
@@ -53,22 +51,21 @@ $edit = function () {
 ?>
 
 <x-app-layout>
-    <x-slot name="title">Tambah Pengguna Baru</x-slot>
 
     @volt
         <div>
+            <x-slot name="title">{{ $user->name }}</x-slot>
             <x-slot name="header">
                 <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('users.index') }}">Pengguna</a></li>
-                <li class="breadcrumb-item"><a href="#">Edit {{ $user->name }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('users.index') }}">Profile</a></li>
+                <li class="breadcrumb-item"><a href="#">{{ $user->name }}</a></li>
             </x-slot>
 
             <div class="card">
                 <div class="card-header">
                     <div class="alert alert-primary" role="alert">
-                        <strong>Edit Admin</strong>
-                        <p>Pada halaman edit pengguna, kamu dapat mengubah informasi pengguna yang sudah ada, termasuk peran
-                            pengguna. Ini memungkinkan kamu untuk memperbarui akses dan izin pengguna sesuai kebutuhan.
+                        <strong>Data Profile</strong>
+                        <p>Pada halaman edit pengguna, kamu dapat mengubah informasi pengguna.
                         </p>
                     </div>
                 </div>
@@ -123,16 +120,6 @@ $edit = function () {
                                     @enderror
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="role" class="form-label">Role</label>
-                            <select class="form-select" wire:model='role' name="role" id="role">
-                                <option selected>Select one</option>
-                                <option value="admin">Admin</option>
-                                <option value="doctor">Dokter</option>
-                                <option value="owner">Pemilik</option>
-                            </select>
                         </div>
 
                         <div class="row mb-3">
