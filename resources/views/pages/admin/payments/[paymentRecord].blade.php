@@ -169,12 +169,16 @@ $loadMedicines = function () {
                                     <div class="row fw-bolder mb-3">
                                         <div class="col">
                                             <button
-                                                class="btn btn-primary {{ $paymentRecord->status == 'unpaid' ?: 'd-none' }}"
+                                                class="btn btn-primary {{ $paymentRecord->status === 'unpaid' ?: 'd-none' }}"
                                                 wire:click="confirmPayment">Konfirmasi
                                                 Pembayaran</button>
                                         </div>
-                                        <div class="col text-end">
-
+                                        <div class="col text-end {{ $paymentRecord->status !== 'unpaid' ?: 'd-none' }}">
+                                            <a href="{{ route('paymentRecords.print', ['paymentRecord' => $paymentRecord]) }}"
+                                                target="_blank" class="btn btn-primary"
+                                                rel="noopener noreferrer">
+                                                Cetak
+                                            </a>
                                         </div>
                                     </div>
 

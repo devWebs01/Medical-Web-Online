@@ -25,7 +25,7 @@
             <!-- Sidebar scroll-->
             <div>
                 <div class="brand-logo d-flex align-items-center justify-content-between">
-                    <a href="./index.html" class="text-nowrap logo-img">
+                    <a href="{{ route('home') }}" class="text-nowrap logo-img">
                         <img src="{{ asset('/admin-assets/images/logos/favicon.png') }}" width="20"
                             alt="Logo" />
                     </a>
