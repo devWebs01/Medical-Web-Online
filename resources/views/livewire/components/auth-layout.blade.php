@@ -8,8 +8,6 @@
     <link rel="shortcut icon" type="image/png" href="{{ asset('/admin-assets/images/logos/favicon.png') }}" />
     <link rel="stylesheet" href="{{ asset('/admin-assets/css/styles.min.css') }}" />
 
-
-
     @vite([])
 </head>
 
@@ -25,13 +23,18 @@
                         <div class="row justify-content-center align-items-center">
                             <div class="col-lg-6 mb-5 mb-lg-0">
                                 <div class="pe-lg-3">
-                                    <h1 class="display-3 fw-bold mb-2 mb-md-3">The Future of Web Design Begins with
-                                        <span class="text-primary">Bootstrap</span>
+                                    <h1 class="display-3 fw-bolder mb-2 mb-md-3">
+                                        Klinik Dokter
+                                        <span class="text-primary">
+                                            Eva Elvita Syofyan
+                                        </span>
                                     </h1>
-                                    <p class="lead mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                                        feugiat erat quis pulvinar consectetur adipiscing elit semper.</p>
+                                    <p class="lead mb-4">
+                                        Memberikan layanan kesehatan terbaik dengan dukungan sistem informasi yang
+                                        efisien.
+                                    </p>
                                 </div>
-                                <div class="row">
+                                {{-- <div class="row">
                                     <div class="col-sm-6 mb-3 mb-sm-0">
                                         <div class="d-flex">
                                             <div class="flex-shrink-0">
@@ -68,7 +71,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
                             <div class="col-lg-6">
                                 <div class="ps-lg-5">

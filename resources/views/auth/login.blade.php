@@ -3,7 +3,7 @@
         @csrf
 
         <div class="mb-3">
-            <label for="email" class="form-label">{{ __('Email Address') }}</label>
+            <label for="email" class="form-label">{{ __('Email') }}</label>
 
             <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email"
                 value="{{ old('email') }}" required autocomplete="email" autofocus>
@@ -16,7 +16,7 @@
         </div>
 
         <div class="mb-3">
-            <label for="password" class="form-label">{{ __('Password') }}</label>
+            <label for="password" class="form-label">{{ __('Kata Sandi') }}</label>
 
             <input id="password" type="password" class="form-control @error('password') is-invalid @enderror"
                 name="password" required autocomplete="current-password">
@@ -28,7 +28,7 @@
             @enderror
         </div>
 
-        <div class="mb-3">
+        {{-- <div class="mb-3">
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" name="remember" id="remember"
                     {{ old('remember') ? 'checked' : '' }}>
@@ -37,7 +37,7 @@
                     {{ __('Remember Me') }}
                 </label>
             </div>
-        </div>
+        </div> --}}
 
         <div class="d-grid">
             <button type="submit" class="btn btn-primary w-100">
@@ -51,9 +51,9 @@
                     </a>
                     @endif --}}
 
-                <a class="btn btn-link" href="{{ route('register') }}">
+                {{-- <a class="btn btn-link" href="{{ route('register') }}">
                     Register
-                </a>
+                </a> --}}
             </div>
         </div>
     </form>
