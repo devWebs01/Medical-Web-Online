@@ -235,7 +235,7 @@ $loadMedicines = function () {
                         </div>
                     </div>
 
-                    <div class="mb-1">
+                    <div class="mb-3">
                         <h6 class="fw-bolder">Biaya Tambahan:</h6>
                         @foreach ($additionalFees as $fee)
                             <div class="form-check">
