@@ -1,16 +1,16 @@
 <?php
 
-use App\Models\Appointment;
+use App\Models\Patient;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use function Laravel\Folio\name;
 use function Livewire\Volt\{computed, state, usesPagination, uses};
 
 uses([LivewireAlert::class]);
 
-name('reports.appointments');
+name('reports.patients');
 
 state([
-    'appointments' => fn () => Appointment::query()->latest()->get(),
+    'patients' => fn() => Patient::query()->latest()->get(),
 ]);
 ?>
 
@@ -18,10 +18,10 @@ state([
     <div>
         @include('layouts.table-print')
 
-        <x-slot name="title">Data Antrian Pasien</x-slot>
+        <x-slot name="title">Data Pasien</x-slot>
         <x-slot name="header">
             <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
-            <li class="breadcrumb-item"><a href="#">Antrian Pasien</a></li>
+            <li class="breadcrumb-item"><a href="#">Pasien</a></li>
         </x-slot>
 
         @volt
@@ -34,21 +34,22 @@ state([
                                 <thead>
                                     <tr>
                                         <th>No.</th>
-                                        <th>Dokter</th>
-                                        <th>Pasien</th>
-                                        <th>Status</th>
+                                        <th>Nama Lengkap</th>
+                                        <th>Jenis Kelamin</th>
+                                        <th>Tanggal Lahir</th>
+                                        <th>Telepon</th>
+                                        <th>Alamat Tinggal</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($appointments as $no => $appointment)
+                                    @foreach ($this->patients as $no => $patient)
                                         <tr>
                                             <td>{{ ++$no }}</td>
-                                            <td>{{ $appointment->doctor->name }}</td>
-                                            <td>{{ $appointment->patient->name }}</td>
-                                            <td>
-                                                <span
-                                                    class="badge p-2 bg-primary">{{ __('status.' . $appointment->status) }}</span>
-                                            </td>
+                                            <td>{{ $patient->name }}</td>
+                                            <td>{{ __('gender.' . $patient->gender) }}</td>
+                                            <td>{{ $patient->dob }}</td>
+                                            <td>{{ $patient->phone }}</td>
+                                            <td>{{ Str::limit($patient->address, 20, '...') }}</td>
                                         </tr>
                                     @endforeach
 

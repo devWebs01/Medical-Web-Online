@@ -46,10 +46,10 @@ $create = function () {
             <div class="card">
                 <div class="card-header">
                     <div class="alert alert-primary" role="alert">
-                        <strong>Tambah Admin</strong>
+                        <strong>Tambah Pengguna</strong>
                         <p>Pada halaman tambah pengguna, kamu dapat memasukkan informasi pengguna baru, seperti nama, alamat
                             email,
-                            kata sandi, dan peran pengguna (admin)
+                            kata sandi, dan peran pengguna (role)
                         </p>
                     </div>
                 </div>

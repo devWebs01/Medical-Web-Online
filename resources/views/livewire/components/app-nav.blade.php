@@ -134,11 +134,11 @@ $paymentUnpaid = computed(function () {
                     </a>
                     <ul id="reportsDropdown" class="collapse">
                         <li>
-                            <a class="sidebar-link" href="{{ route('reports.appointments') }}">
+                            <a class="sidebar-link" href="{{ route('reports.patients') }}">
                                 <span>
                                     <i class='fs-6 bx bxs-calendar-plus'></i>
                                 </span>
-                                <span class="hide-menu">Antrian Pasien</span>
+                                <span class="hide-menu">Pasien</span>
                             </a>
                         </li>
                         <li>
