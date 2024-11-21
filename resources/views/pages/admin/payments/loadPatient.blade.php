@@ -1,15 +1,33 @@
 <div class="row">
-    <h6 class="fw-bolder mb-3">Biodata</h6>
+    <h6 class="fw-bolder">Biodata</h6>
     <div class="col-md">
-        <p><strong>Nama Pasien:</strong> {{ $medicalRecord->patient->name }}</p>
-        <p><strong>Nomor Rekam Medis:</strong> {{ $medicalRecord->id }}</p>
-        <p><strong>Jenis Kelamin:</strong> {{ $medicalRecord->patient->gender }}</p>
+        <p><strong>Nama Pasien:</strong>
+            <br>
+            {{ $medicalRecord->patient->name }}
+        </p>
+        <p><strong>Nomor Rekam Medis:</strong>
+            <br>
+            {{ $medicalRecord->id }}
+        </p>
+        <p><strong>Jenis Kelamin:</strong>
+            <br>
+            {{ $medicalRecord->patient->gender }}
+        </p>
     </div>
     <div class="col-md text-md-end">
         <p><strong>Tanggal Lahir:</strong>
-            {{ \Carbon\Carbon::parse($medicalRecord->patient->dob)->format('d M Y') }}</p>
-        <p><strong>Alamat:</strong> {{ $medicalRecord->patient->address }}</p>
-        <p><strong>Telepon:</strong> {{ $medicalRecord->patient->phone }}</p>
+            <br>
+
+            {{ \Carbon\Carbon::parse($medicalRecord->patient->dob)->format('d M Y') }}
+        </p>
+        <p><strong>Alamat:</strong>
+            <br>
+            {{ $medicalRecord->patient->address }}
+        </p>
+        <p><strong>Telepon:</strong>
+            <br>
+            {{ $medicalRecord->patient->phone }}
+        </p>
     </div>
 </div>
 <hr>

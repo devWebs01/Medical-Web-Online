@@ -79,10 +79,15 @@
                                             <input class="form-check-input p-3 border border-primary" type="radio"
                                                 wire:model="room_id" name="room_id" value="{{ $room->id }}"
                                                 id="flexRadioDefault{{ $room->room_number }}"
-                                                {{ $room_id == $room->id ? 'checked' : '' }}>
+                                                {{ $room_id == $room->id ? 'checked' : '' }}
+                                                {{ $room->availability == 'occupied' ? 'disabled' : '' }}>
                                         </div>
                                         <div class="col-auto">
-                                            <i class='bx bxs-bed fs-6'></i>
+                                            <span
+                                                class="badge {{ $room->availability !== 'occupied' ? 'bg-primary' : 'bg-danger' }}">
+                                                {{ $room->availability !== 'occupied' ? 'Tersedia' : 'Tidak Tersedia' }}
+
+                                            </span>
                                             <h4 class="fw-bolder">
                                                 Kamar {{ $room->room_number }}
                                             </h4>

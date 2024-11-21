@@ -49,9 +49,9 @@
                                                 class="badge p-2 bg-warning">{{ __('status.' . $appointment->status) }}</span>
                                         </td>
                                         <td>
-                                            <div class="d-flex gap-3">
+                                            <div class="d-flex gap-3 justify-content-center">
                                                 <a class="btn btn-primary btn-sm
-                                            {{ Auth()->user()->role === 'doctor' ?: 'd-none' }}
+                                            {{ $role === 'doctor' || $role === 'owner' ? '' : 'd-none' }}
                                              "
                                                     href="{{ route('appointments.patient', ['appointment' => $appointment->id]) }}"
                                                     role="button">Tindakan</a>

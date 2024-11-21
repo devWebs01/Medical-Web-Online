@@ -4,6 +4,7 @@ use App\Models\InpatientRecord;
 use App\Models\MedicalRecord;
 use App\Models\Prescription;
 use App\Models\Medication;
+use App\Models\Room;
 use App\Models\PaymentRecord;
 use Illuminate\Validation\Rule;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -33,6 +34,10 @@ $dischargePatient = function ($inpatientRecordId) {
 
     // Update status menjadi 'discharged'
     $inpatientRecord->update(['status' => 'discharged']);
+
+    // Update kamar menjadi 'available'
+    $room = Room::find($inpatientRecord->room_id);
+    $room->update(['availability' => 'available']);
 
     // Ambil data obat-obatan yang terkait dengan medical record
     $prescriptions = Prescription::where('medical_record_id', $inpatientRecord->medical_record_id)->get();
@@ -134,9 +139,12 @@ $dischargePatient = function ($inpatientRecordId) {
                     <p>{{ $medicalRecord->doctor_notes ?? '-' }}</p>
                 </div>
 
-                
+
                 <div class="col-md-12 text-end">
-                    <button class="btn btn-danger {{ $medicalRecord->status !== 'completed' ?: 'd-none' }}"
+                    <button
+                        class="btn btn-danger
+                    {{ $medicalRecord->status !== 'completed' ?: 'd-none' }}
+                     "
                         wire:click="dischargePatient({{ $medicalRecord->inpatientRecord->id }})">
                         Pulangkan Pasien
                     </button>

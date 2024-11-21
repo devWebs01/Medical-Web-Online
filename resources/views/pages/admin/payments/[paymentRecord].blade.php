@@ -18,9 +18,9 @@ state([
     'medicalRecord',
     'medicines',
     'appointmentId',
+    'selectedFees' => [], // Biaya tambahan yang dipilih
     'prescriptions' => fn() => Prescription::where('medical_record_id', $this->appointmentId)->get(),
     'medications' => Medication::all(),
-    'selectedFees' => [], // Biaya tambahan yang dipilih
     'totalCost' => fn() => $this->paymentRecord->total_amount ?? 0, // Ambil dari database jika tersedia
     'additionalFees' => fn() => AdditionalFees::all(),
 ]);
@@ -37,9 +37,11 @@ $calculateTotalCost = function () {
         return $prescription->medication->price * $prescription->quantity;
     });
 
+    $inpatientCost = $this->medicalRecord->type !== 'inpatient' ? '0' : '50000';
+
     $medicationTotal = $this->prescriptions->sum(fn($item) => $item->medication->price * $item->qty);
     $additionalTotal = collect($this->selectedFees)->sum(fn($feeId) => AdditionalFees::find($feeId)->cost);
-    $this->totalCost = $medicationTotal + $additionalTotal + $doctorPrescriptions;
+    $this->totalCost = $medicationTotal + $additionalTotal + $doctorPrescriptions + $inpatientCost;
 };
 
 $confirmPayment = function () {
@@ -112,7 +114,7 @@ $loadMedicines = function () {
                                     data-bs-target="#administration" aria-expanded="false" aria-controls="administration">
                                     <strong>Data Pasien</strong>
                                     <span
-                                        class=" ms-3 badge text-bg-primary fs-1">{{ __('status.' . $medicalRecord->type) }}</span>
+                                        class="ms-3 badge text-bg-primary fs-1">{{ __('status.' . $medicalRecord->type) }}</span>
                                 </button>
                             </h2>
                             <div id="administration" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
@@ -140,6 +142,16 @@ $loadMedicines = function () {
 
                                     <div class="mb-4">
                                         <h6 class="fw-bolder">Biaya Tambahan:</h6>
+
+                                        <div class="form-check">
+                                            <input type="checkbox" value="room" class="form-check-input" disabled
+                                                {{ $medicalRecord->type !== 'inpatient' ?: 'checked' }}>
+                                            <div class="row">
+                                                <div class="col">Biaya Kamar</div>
+                                                <div class="col text-end">{{ formatRupiah(50000) }}</div>
+                                            </div>
+                                        </div>
+
                                         @foreach ($additionalFees as $fee)
                                             <div class="form-check">
                                                 <input type="checkbox" wire:model.live="selectedFees"
@@ -147,8 +159,8 @@ $loadMedicines = function () {
                                                     wire:change="calculateTotalCost"
                                                     {{ $paymentRecord->status === 'unpaid' ?: 'disabled' }}>
                                                 <div class="row">
-                                                    <div class="col-md">{{ $fee->name }}</div>
-                                                    <div class="col-md text-end">{{ formatRupiah($fee->cost) }}</div>
+                                                    <div class="col">{{ $fee->name }}</div>
+                                                    <div class="col text-end">{{ formatRupiah($fee->cost) }}</div>
                                                 </div>
                                             </div>
                                         @endforeach
@@ -170,13 +182,14 @@ $loadMedicines = function () {
                                         <div class="col">
                                             <button
                                                 class="btn btn-primary {{ $paymentRecord->status === 'unpaid' ?: 'd-none' }}"
-                                                wire:click="confirmPayment">Konfirmasi
+                                                wire:click="confirmPayment"
+                                                wire:confirm="Apakah Anda yakin data ini susah sesuai?"
+                                                >Konfirmasi
                                                 Pembayaran</button>
                                         </div>
-                                        <div class="col text-end {{ $paymentRecord->status !== 'unpaid' ?: 'd-none' }}">
+                                        <div class="col text-end">
                                             <a href="{{ route('paymentRecords.print', ['paymentRecord' => $paymentRecord]) }}"
-                                                target="_blank" class="btn btn-primary"
-                                                rel="noopener noreferrer">
+                                                target="_blank" class="btn btn-primary" rel="noopener noreferrer">
                                                 Cetak
                                             </a>
                                         </div>

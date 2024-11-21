@@ -318,7 +318,7 @@ $removeMedicine = function ($index) {
                                 <div class="col-auto">
                                     <button type="submit"
                                         class="btn btn-primary
-                                {{ $role === 'doctor' ?: 'd-none' }}
+                                {{ $role === 'doctor' || $role === 'owner' ? '' : 'd-none' }}
                                  ">
                                         Submit
                                     </button>

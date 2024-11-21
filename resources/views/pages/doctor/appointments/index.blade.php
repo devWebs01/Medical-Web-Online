@@ -50,7 +50,6 @@ state(['medicalRecords' => fn() => MedicalRecord::query()->latest()->get()]);
                                             <td>
                                                 {{ __('status.' . $item->type) }}
                                             </td>
-
                                             <td>
                                                 <a class="btn btn-primary btn-sm"
                                                     href="{{ route('appointments.patient', ['appointment' => $item->appointment->id]) }}"

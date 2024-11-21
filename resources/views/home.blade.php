@@ -12,7 +12,7 @@ use Jantinnerezo\LivewireAlert\LivewireAlert;
 uses([LivewireAlert::class]);
 
 state([
-    'doctors' => fn() => User::where('role', 'doctor')->get(),
+    'doctors' => fn() => User::where('role', 'doctor')->orWhere('role', 'owner')->get(),
     'date' => fn() => now(),
     'patient_id',
     'doctor_id',

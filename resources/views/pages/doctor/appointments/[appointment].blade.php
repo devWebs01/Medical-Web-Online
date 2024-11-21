@@ -196,8 +196,6 @@ $loadMedicalRecord = function ($medicalRecord) {
 
             <div class="mb-3 {{ $medicalRecord != null ?: 'd-none' }}">
 
-               
-
                 @include('pages.doctor.appointments.prescription', [
                     'medicalRecord' => $medicalRecord,
                 ])
