@@ -159,38 +159,50 @@ $loadMedicalRecord = function ($medicalRecord) {
                     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                         @if ($medicalRecord)
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link {{ $medicalRecord ? 'active' : '' }}" id="pills-details-tab"
-                                    data-bs-toggle="pill" data-bs-target="#pills-details" type="button" role="tab"
-                                    aria-controls="pills-details"
-                                    aria-selected="{{ $medicalRecord ? 'true' : 'false' }}">Data
-                                    Pemeriksaan</button>
+                                <button class="nav-link {{ $medicalRecord ? 'active' : '' }}" id="pills-checkUp-tab"
+                                    data-bs-toggle="pill" data-bs-target="#pills-checkUp" type="button" role="tab"
+                                    aria-controls="pills-checkUp" aria-selected="{{ $medicalRecord ? 'true' : 'false' }}">
+                                    Data Pemeriksaan
+                                </button>
                             </li>
                         @endif
 
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link {{ !$medicalRecord ? 'active' : '' }}" id="pills-edit-tab"
-                                data-bs-toggle="pill" data-bs-target="#pills-edit" type="button" role="tab"
-                                aria-controls="pills-edit" aria-selected="{{ !$medicalRecord ? 'true' : 'false' }}">Form
-                                Input</button>
+                            <button class="nav-link {{ !$medicalRecord ? 'active' : '' }}" id="pills-formMedicalRecord-tab"
+                                data-bs-toggle="pill" data-bs-target="#pills-formMedicalRecord" type="button"
+                                role="tab" aria-controls="pills-formMedicalRecord"
+                                aria-selected="{{ !$medicalRecord ? 'true' : 'false' }}">
+                                Form Input
+                            </button>
+                        </li>
+
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pills-history-tab" data-bs-toggle="pill"
+                                data-bs-target="#pills-history" type="button" role="tab" aria-controls="pills-history"
+                                aria-selected="false">
+                                Riwayat
+                            </button>
                         </li>
                     </ul>
 
                     <div class="tab-content" id="pills-tabContent">
                         @if ($medicalRecord)
-                            <div class="tab-pane fade {{ $medicalRecord ? 'show active' : '' }}" id="pills-details"
-                                role="tabpanel" aria-labelledby="pills-details-tab" tabindex="0">
+                            <div class="tab-pane fade {{ $medicalRecord ? 'show active' : '' }}" id="pills-checkUp"
+                                role="tabpanel" aria-labelledby="pills-checkUp-tab" tabindex="0">
                                 @include('pages.doctor.appointments.checkUp')
                             </div>
                         @endif
 
-                        <div class="tab-pane fade {{ !$medicalRecord ? 'show active' : '' }}" id="pills-edit"
-                            role="tabpanel" aria-labelledby="pills-edit-tab" tabindex="0">
+                        <div class="tab-pane fade {{ !$medicalRecord ? 'show active' : '' }}" id="pills-formMedicalRecord"
+                            role="tabpanel" aria-labelledby="pills-formMedicalRecord-tab" tabindex="0">
                             @include('pages.doctor.appointments.formMedicalRecord')
                         </div>
+
+                        <div class="tab-pane fade" id="pills-history" role="tabpanel" aria-labelledby="pills-history-tab"
+                            tabindex="0">
+                            @include('pages.doctor.appointments.history', ['patient' => $appointment->patient])
+                        </div>
                     </div>
-
-
-
                 </div>
             </div>
 

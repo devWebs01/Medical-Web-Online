@@ -9,7 +9,7 @@ use App\Models\PaymentRecord;
 use Illuminate\Validation\Rule;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use function Livewire\Volt\{state, uses};
-use function Laravel\Folio\name;
+
 
 uses([LivewireAlert::class]);
 
@@ -93,7 +93,6 @@ $dischargePatient = function ($inpatientRecordId) {
 @volt
     <div>
         <div class="row">
-
             <div class="col-md-6">
                 <strong>Pemeriksaan Fisik:</strong>
                 <p>{{ $medicalRecord->physical_exam }}</p>

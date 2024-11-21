@@ -150,7 +150,7 @@ $paymentUnpaid = computed(function () {
                             </a>
                         </li>
                         <li>
-                            <a class="sidebar-link" href="{{ route('reports.paymentRecords') }}">
+                            <a class="sidebar-link {{ Auth()->user()->role !== 'doctor' ?: 'd-none' }}" href="{{ route('reports.paymentRecords') }}">
                                 <span>
                                     <i class='fs-6 bx bx-money'></i>
                                 </span>
