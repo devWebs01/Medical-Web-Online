@@ -23,7 +23,8 @@
             </li>
         </ul>
         <div class="tab-content" id="pills-tabContent">
-            <!-- Tab untuk Antrian Hari Ini -->
+
+            <!-- Tab untuk Antrian Hari Ini/Menunggu -->
             <div class="tab-pane fade show active" id="pills-todayAppointments" role="tabpanel"
                 aria-labelledby="pills-todayAppointments-tab">
                 <div class="card-body">
@@ -51,7 +52,17 @@
                                         <td>
                                             <div class="d-flex gap-3 justify-content-center">
                                                 <a class="btn btn-primary btn-sm
-                                            {{ $role === 'doctor' || $role === 'owner' ? '' : 'd-none' }}
+                                            {{-- {{ $role === 'doctor' || $role === 'owner' ? '' : 'd-none' }} --}}
+
+                                            @if ($role === 'doctor')
+
+                                            @elseif($role === 'owner')
+
+                                            @elseif($role === 'admin')
+                                            d-none
+
+                                            @endif
+
                                              "
                                                     href="{{ route('appointments.patient', ['appointment' => $appointment->id]) }}"
                                                     role="button">Tindakan</a>
@@ -71,7 +82,7 @@
                 </div>
             </div>
 
-            <!-- Tab untuk Antrian Selesai -->
+            <!-- Tab untuk Antrian Selesai/Sudah Berobat -->
             <div class="tab-pane fade" id="pills-completedAppointments" role="tabpanel"
                 aria-labelledby="pills-completedAppointments-tab">
                 <div class="card-body">
@@ -109,7 +120,7 @@
                 </div>
             </div>
 
-            <!-- Tab untuk Antrian Selesai -->
+            <!-- Tab untuk Antrian dibatalkan/Tidak hadir -->
             <div class="tab-pane fade" id="pills-canceledAppointments" role="tabpanel"
                 aria-labelledby="pills-canceledAppointments-tab">
                 <div class="card-body">
