@@ -19,7 +19,9 @@ state([
     'notes',
     'role' => fn() => Auth()->user()->role,
     'inpatientCount' => fn() => InpatientRecord::where('status', 'active')->count(),
-    'appointmentCount' => fn() => Appointment::where('status', 'waiting')->whereDate('date', now()->toDateString())->count(),
+    'appointmentCount' => fn() => Appointment::where('status', 'waiting')
+        ->whereDate('date', now()->toDateString())
+        ->count(),
 ]);
 
 rules([
@@ -107,7 +109,7 @@ $cancelAppointment = function (appointment $appointment) {
                     <div class="card mb-3">
                         <div class="card-body text-white rounded-3"
                             style="
-                            background-image: url('https://bootstrapget.com/demos/medflex-medical-admin-template/assets/images/banner.svg');
+                            background-image: url('{{ asset('/admin-assets/images/backgrounds/banner.svg') }}');
                             background-size: cover;
                             background-position: right;
                             ">
