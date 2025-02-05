@@ -52,17 +52,7 @@
                                         <td>
                                             <div class="d-flex gap-3 justify-content-center">
                                                 <a class="btn btn-primary btn-sm
-                                            {{-- {{ $role === 'doctor' || $role === 'owner' ? '' : 'd-none' }} --}}
-
-                                            @if ($role === 'doctor')
-
-                                            @elseif($role === 'owner')
-
-                                            @elseif($role === 'admin')
-                                            d-none
-
-                                            @endif
-
+                                            {{ $role === 'doctor' || $role === 'owner' ? '' : 'd-none' }}
                                              "
                                                     href="{{ route('appointments.patient', ['appointment' => $appointment->id]) }}"
                                                     role="button">Tindakan</a>
