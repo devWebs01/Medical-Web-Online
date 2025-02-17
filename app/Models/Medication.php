@@ -20,8 +20,6 @@ class Medication extends Model
 
     /**
      * Get all of the prescriptions for the MedicalRecord
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function prescriptions(): HasMany
     {

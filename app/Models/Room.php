@@ -18,8 +18,6 @@ class Room extends Model
 
     /**
      * Get all of the inpatient_records for the MedicalRecord
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function inpatientRecords(): HasMany
     {

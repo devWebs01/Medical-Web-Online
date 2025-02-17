@@ -21,17 +21,14 @@ class InpatientRecord extends Model
 
     /**
      * Get the medicalRecord that owns the medicalRecord
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function medicalRecord(): BelongsTo
     {
         return $this->belongsTo(MedicalRecord::class, 'medical_record_id');
     }
+
     /**
      * Get the room that owns the room
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function room(): BelongsTo
     {

@@ -28,8 +28,6 @@ class Patient extends Model
 
     /**
      * Get all of the medicalRecords for the Patient
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function medicalRecords(): HasMany
     {

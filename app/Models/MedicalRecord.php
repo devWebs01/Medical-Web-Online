@@ -33,8 +33,6 @@ class MedicalRecord extends Model
 
     /**
      * Get all of the prescriptions for the MedicalRecord
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function prescriptions(): HasMany
     {
@@ -53,8 +51,6 @@ class MedicalRecord extends Model
 
     /**
      * Get the patient that owns the MedicalRecord
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function patient(): BelongsTo
     {

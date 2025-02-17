@@ -2,10 +2,8 @@
 
 namespace App\Models;
 
-use App\Models\Medication;
-use App\Models\MedicalRecord;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -21,7 +19,7 @@ class PaymentRecord extends Model
         'invoice',
     ];
 
-     /**
+    /**
      * Boot method untuk membuat invoice otomatis.
      */
     protected static function boot()
@@ -40,7 +38,8 @@ class PaymentRecord extends Model
     {
         $latestInvoice = self::latest()->first();
         $nextNumber = $latestInvoice ? intval(substr($latestInvoice->invoice, -4)) + 1 : 1;
-        return 'INV-' . date('Y') . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+
+        return 'INV-'.date('Y').'-'.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
 
     public function medicalRecord(): BelongsTo
@@ -54,6 +53,7 @@ class PaymentRecord extends Model
             ->withPivot('quantity', 'price')
             ->withTimestamps();
     }
+
     public function additionalFees(): BelongsToMany
     {
         return $this->belongsToMany(AdditionalFees::class, 'payment_additional_fee');

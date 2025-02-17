@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\AdditionalFees;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class AdditionalFeesSeeder extends Seeder

@@ -21,8 +21,6 @@ class Prescription extends Model
 
     /**
      * Get the medical_record that owns the Prescription
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function medical_record(): BelongsTo
     {
@@ -31,13 +29,9 @@ class Prescription extends Model
 
     /**
      * Get the medication that owns the Prescription
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function medication(): BelongsTo
     {
         return $this->belongsTo(Medication::class, 'medicine_id');
     }
-
-
 }

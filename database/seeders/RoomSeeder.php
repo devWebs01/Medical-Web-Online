@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Room;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class RoomSeeder extends Seeder
 {
@@ -24,10 +24,10 @@ class RoomSeeder extends Seeder
         ];
 
         foreach ($rooms as $room) {
-            DB::table('Rooms')->insert(array_merge($room, [
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]));
+            Room::create([
+                'room_number' => $room['room_number'],
+                'price' => $room['price'],
+            ]);
         }
     }
 }
