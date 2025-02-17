@@ -32,6 +32,6 @@ class InpatientRecord extends Model
      */
     public function room(): BelongsTo
     {
-        return $this->belongsTo(room::class, 'room_id');
+        return $this->belongsTo(Room::class, 'room_id');
     }
 }
