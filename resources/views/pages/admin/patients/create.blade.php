@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\patient;
+use App\Models\Patient;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use function Livewire\Volt\{state, rules, uses};
 use function Laravel\Folio\name;

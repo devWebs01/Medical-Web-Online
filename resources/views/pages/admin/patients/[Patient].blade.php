@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\patient;
+use App\Models\Patient;
 use Illuminate\Validation\Rule;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use function Livewire\Volt\{state, rules, uses};
