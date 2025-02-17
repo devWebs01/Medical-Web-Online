@@ -106,7 +106,7 @@ $paymentUnpaid = computed(function () {
                     </li>
                 @endif
 
-                <li class="sidebar-item {{ Auth()->user()->role === 'owner' ?: 'd-none' }}">
+                <li class="sidebar-item {{ Auth()->user()->role === 'owner' || Auth()->user()->role === 'admin' ?: 'd-none' }}">
                     <a class="sidebar-link position-relative" href="{{ route('settings.index') }}" aria-expanded="false">
                         <span>
                             <i class='fs-6 bx bx-cog'></i>
@@ -121,13 +121,6 @@ $paymentUnpaid = computed(function () {
                 </li>
 
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="#" aria-expanded="false" data-bs-toggle="collapse"
-                        data-bs-target="#reportsDropdown">
-                        <span>
-                            <i class='fs-6 bx bxs-report'></i>
-                        </span>
-                        <span class="hide-menu">Laporan</span>
-                    </a>
                     <ul id="reportsDropdown" class="collapse">
                         <li>
                             <a class="sidebar-link" href="{{ route('reports.patients') }}">
