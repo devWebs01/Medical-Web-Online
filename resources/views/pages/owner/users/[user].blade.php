@@ -16,7 +16,7 @@ state([
     'telp' => fn() => $this->user->telp,
     'role' => fn() => $this->user->role,
     'password',
-    'user',
+    'user', 
 ]);
 
 $edit = function () {
