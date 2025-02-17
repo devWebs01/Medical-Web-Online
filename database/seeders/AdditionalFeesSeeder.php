@@ -19,7 +19,6 @@ class AdditionalFeesSeeder extends Seeder
             ['name' => 'Perawatan', 'cost' => 20000],
             ['name' => 'Perawatan Khusus', 'cost' => 30000],
             ['name' => 'Nutrisi', 'cost' => 45000],
-            ['name' => 'Biaya Kamar', 'cost' => 50000],
         ];
 
         foreach ($fees as $fee) {
