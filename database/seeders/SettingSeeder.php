@@ -13,10 +13,10 @@ class SettingSeeder extends Seeder
     public function run(): void
     {
         Setting::create([
-            'name' => 'ABC',
-            'telp' => '08978301766',
-            'whatsApp' => '08978301766',
-            'address' => 'Lorem ipsum dolor sit amet consectetur adipiscing elit luctus nec habitasse,',
+            'name' => 'Klinik Dokter Eva Elvita Syofyan',
+            'telp' => '6287885044122',
+            'whatsApp' => '6287885044122',
+            'address' => 'Lorem ipsum dolor sit amet consectetur adipiscing elit luctus nec habitasse',
         ]);
     }
 }

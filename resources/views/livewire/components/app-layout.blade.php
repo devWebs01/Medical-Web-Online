@@ -13,7 +13,7 @@
 
     @stack('css')
 
-    
+    @vite([])
 </head>
 
 <body>
@@ -25,11 +25,9 @@
             <!-- Sidebar scroll-->
             <div>
                 <div class="brand-logo d-flex align-items-center justify-content-between">
-                    <a href="{{ route('home') }}" class="text-nowrap logo-img">
-                        <img src="{{ asset('/admin-assets/images/logos/favicon.png') }}" width="20"
-                            alt="Logo" />
-                    </a>
-                    <strong class="fs-6">Medical</strong>
+                    <strong class="overflow-hidden text-center">
+                        {{ $setting->name ?? '' }}
+                    </strong>
                     <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
                         <i class="ti ti-x fs-8"></i>
                     </div>
@@ -52,10 +50,10 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link nav-icon-hover" href="javascript:void(0)">
+                            {{-- <a class="nav-link nav-icon-hover" href="javascript:void(0)">
                                 <i class="ti ti-bell-ringing"></i>
                                 <div class="notification bg-primary rounded-circle"></div>
-                            </a>
+                            </a> --}}
                         </li>
                     </ul>
                     <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
@@ -76,8 +74,8 @@
                                         </a>
                                         <a href="{{ route('profile.users') }}"
                                             class="d-flex align-items-center gap-2 dropdown-item">
-                                            <i class="ti ti-mail fs-6"></i>
-                                            <p class="mb-0 fs-3">My Account</p>
+                                            <i class="ti ti-settings fs-6"></i>
+                                            <p class="mb-0 fs-3">Akun Profile</p>
                                         </a>
                                         <a href="{{ route('logout') }}"
                                             onclick="event.preventDefault();

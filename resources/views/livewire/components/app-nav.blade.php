@@ -1,11 +1,7 @@
 <?php
 
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Patient;
 use App\Models\PaymentRecord;
-use App\Models\Appointment;
-use function Livewire\Volt\{state, uses, rules, computed};
+use function Livewire\Volt\{computed};
 
 $paymentUnpaid = computed(function () {
     return PaymentRecord::where('status', 'unpaid')->count();

@@ -4,17 +4,24 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Modernize Free</title>
+    <title> {{ $setting->name ?? 'Klinik Dokter Eva Elvita Syofyan' }}</title>
     <link rel="shortcut icon" type="image/png" href="{{ asset('/admin-assets/images/logos/favicon.png') }}" />
     <link rel="stylesheet" href="{{ asset('/admin-assets/css/styles.min.css') }}" />
 
-    
+@vite([])
 </head>
 
 <body>
     <!--  Body Wrapper -->
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
-        data-sidebar-position="fixed" data-header-position="fixed">
+        data-sidebar-position="fixed" data-header-position="fixed"
+        style="  background-image: url('{{ asset('admin-assets/images/backgrounds/hero-bg.jpg') }}');
+        background-repeat: no-repeat;
+        background-size: cover; /* Memastikan gambar menutupi seluruh layar */
+        background-position: center; /* Memusatkan gambar */
+        min-height: 100vh; /* Pastikan tinggi penuh 100% viewport */
+        width: 100%;"
+        >
         <div
             class="position-relative overflow-hidden radial-gradient min-vh-100 d-flex align-items-center justify-content-center">
             <div class="d-flex align-items-center justify-content-center w-100">
@@ -24,9 +31,8 @@
                             <div class="col-lg-6 mb-5 mb-lg-0">
                                 <div class="pe-lg-3">
                                     <h1 class="display-3 fw-bolder mb-2 mb-md-3">
-                                        Klinik Dokter
-                                        <span class="text-primary">
-                                            Eva Elvita Syofyan
+                                        <span class="text-dark">
+                                            {{ $setting->name ?? 'Klinik Dokter Eva Elvita Syofyan' }}
                                         </span>
                                     </h1>
                                     <p class="lead mb-4">
