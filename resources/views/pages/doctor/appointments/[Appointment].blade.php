@@ -152,6 +152,7 @@ $loadMedicalRecord = function ($medicalRecord) {
                 <div class="card-header">
                     <div class="alert alert-primary" role="alert">
                         <strong>Pemeriksaan - {{ $appointment->patient->name }}</strong>
+                        <p>{{ $appointment->notes ?? '' }}</p>
                     </div>
                 </div>
 

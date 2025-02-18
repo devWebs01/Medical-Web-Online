@@ -135,7 +135,7 @@ $dischargePatient = function ($inpatientRecordId) {
 
                 <div class="col-md-12">
                     <strong>Catatan Dokter:</strong>
-                    <p>{{ $medicalRecord->doctor_notes ?? '-' }}</p>
+                    <p>{{ $medicalRecord->inpatientRecord->doctor_notes }}</p>
                 </div>
 
 
