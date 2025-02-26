@@ -17,7 +17,7 @@ rules([
     'gender' => 'required|in:male,female',
     'dob' => 'required|date|before:today',
     'address' => 'required|string|max:500',
-    'phone' => 'required|string|min:11|max:13|regex:/^([0-9\s\-\+\(\)]*)$/',
+    'phone' => 'required|min:11|max:13|regex:/^([0-9\s\-\+\(\)]*)$/',
 ]);
 
 $create = function () {

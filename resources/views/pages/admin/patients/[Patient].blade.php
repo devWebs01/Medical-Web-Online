@@ -24,12 +24,15 @@ $edit = function () {
     $patient = $this->patient;
 
     $validateData = $this->validate([
-        'identity' => 'required' . Rule::unique(Patient::class)->ignore($patient->id),
+        'identity' => [
+            'required',
+            Rule::unique(Patient::class)->ignore($patient->id),
+        ],
         'name' => 'required|string|max:255',
         'gender' => 'required|in:male,female',
         'dob' => 'required|date|before:today',
         'address' => 'required|string|max:500',
-        'phone' => 'required|string|min:11|max:13|regex:/^([0-9\s\-\+\(\)]*)$/',
+        'phone' => 'required|min:11|max:13|regex:/^([0-9\s\-\+\(\)]*)$/',
     ]);
 
     $patient->update($validateData);
