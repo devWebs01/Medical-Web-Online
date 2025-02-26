@@ -18,7 +18,7 @@ $patients = computed(function () {
     } else {
         return patient::query()
             ->where(function ($query) {
-                $query->whereAny(['name', 'gender', 'phone', 'address'], 'LIKE', "%{$this->search}%");
+                $query->whereAny(['identity','name', 'gender', 'phone', 'address'], 'LIKE', "%{$this->search}%");
             })
             ->latest()
             ->paginate(10);
