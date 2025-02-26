@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('patients', function (Blueprint $table) {
             $table->id();
+            $table->string('identity')->unique();
             $table->string('name');
             $table->enum('gender', ['male', 'female']);
             $table->date('dob');

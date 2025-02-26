@@ -9,9 +9,10 @@ uses([LivewireAlert::class]);
 
 name('patients.create');
 
-state(['name', 'gender', 'dob', 'address', 'phone']);
+state(['identity','name', 'gender', 'dob', 'address', 'phone']);
 
 rules([
+    'identity' => 'required|unique:patients,identity',
     'name' => 'required|string|max:255',
     'gender' => 'required|in:male,female',
     'dob' => 'required|date|before:today',
@@ -61,6 +62,17 @@ $create = function () {
                         @csrf
 
                         <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="identity" class="form-label">NIK / No. Id</label>
+                                    <input type="number" class="form-control @error('identity') is-invalid @enderror"
+                                        wire:model="identity" identity="identity" id="identity" aria-describedby="identityId"
+                                        placeholder="Enter patient identity" autofocus autocomplete="identity" />
+                                    @error('identity')
+                                        <small id="identityId" class="form-text text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                            </div>
                             <div class="col-md">
                                 <div class="mb-3">
                                     <label for="name" class="form-label">Nama Lengkap</label>

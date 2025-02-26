@@ -74,6 +74,7 @@ $destroy = function (patient $patient) {
                                 <thead>
                                     <tr>
                                         <th>No.</th>
+                                        <th>NIK/No. Id</th>
                                         <th>Nama Lengkap</th>
                                         <th>Jenis Kelamin</th>
                                         <th>Tanggal Lahir</th>
@@ -86,6 +87,7 @@ $destroy = function (patient $patient) {
                                     @foreach ($this->patients as $no => $patient)
                                         <tr>
                                             <td>{{ ++$no }}</td>
+                                            <td>{{ $patient->identity }}</td>
                                             <td>{{ $patient->name }}</td>
                                             <td>{{ __('gender.' . $patient->gender) }}</td>
                                             <td>{{ $patient->dob }}</td>

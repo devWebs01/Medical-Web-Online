@@ -16,6 +16,7 @@ class Patient extends Model
         'dob',
         'address',
         'phone',
+        'identity',
     ];
 
     /**

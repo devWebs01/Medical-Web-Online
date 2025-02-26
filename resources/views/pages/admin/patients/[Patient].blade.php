@@ -11,6 +11,7 @@ uses([LivewireAlert::class]);
 name('patients.edit');
 
 state([
+    'identity' => fn() => $this->patient->identity,
     'name' => fn() => $this->patient->name,
     'gender' => fn() => $this->patient->gender,
     'dob' => fn() => $this->patient->dob,
@@ -19,18 +20,17 @@ state([
     'patient',
 ]);
 
-rules([
-    'name' => 'required|string|max:255',
-    'gender' => 'required|in:male,female',
-    'dob' => 'required|date|before:today',
-    'address' => 'required|string|max:500',
-    'phone' => 'required|string|min:11|max:13|regex:/^([0-9\s\-\+\(\)]*)$/',
-]);
-
 $edit = function () {
     $patient = $this->patient;
 
-    $validateData = $this->validate();
+    $validateData = $this->validate([
+        'identity' => 'required' . Rule::unique(Patient::class)->ignore($patient->id),
+        'name' => 'required|string|max:255',
+        'gender' => 'required|in:male,female',
+        'dob' => 'required|date|before:today',
+        'address' => 'required|string|max:500',
+        'phone' => 'required|string|min:11|max:13|regex:/^([0-9\s\-\+\(\)]*)$/',
+    ]);
 
     $patient->update($validateData);
 
@@ -68,6 +68,19 @@ $edit = function () {
                         @csrf
 
                         <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="identity" class="form-label">NIK / No. Id</label>
+                                    <input type="number" class="form-control @error('identity') is-invalid @enderror"
+                                        wire:model="identity" identity="identity" id="identity"
+                                        aria-describedby="identityId" placeholder="Enter patient identity" autofocus
+                                        autocomplete="identity" />
+                                    @error('identity')
+                                        <small id="identityId" class="form-text text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                            </div>
+
                             <div class="col-md">
                                 <div class="mb-3">
                                     <label for="name" class="form-label">Nama Lengkap</label>
