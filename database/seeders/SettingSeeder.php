@@ -13,9 +13,9 @@ class SettingSeeder extends Seeder
     public function run(): void
     {
         Setting::create([
-            'name' => 'Klinik Dokter Eva Elvita Syofyan',
-            'telp' => '6287885044122',
-            'whatsApp' => '6287885044122',
+            'name' => 'Klinik Mulia Jambi',
+            'telp' => '6287885123456',
+            'whatsApp' => '6287885123456',
             'address' => 'Lorem ipsum dolor sit amet consectetur adipiscing elit luctus nec habitasse',
         ]);
     }
