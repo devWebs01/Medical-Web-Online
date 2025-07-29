@@ -1,14 +1,16 @@
 <x-auth-layout>
-    <form method="POST" action="{{ route('register') }}">
+    <x-slot name="title">Halaman Register</x-slot>
+
+    <form method="POST" action="{{ route("register") }}">
         @csrf
 
         <div class="mb-3">
-            <label for="name" class="form-label">{{ __('Name') }}</label>
+            <label for="name" class="form-label">{{ __("Name") }}</label>
 
-            <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name"
-                value="{{ old('name') }}" required autocomplete="name" autofocus>
+            <input id="name" type="text" class="form-control @error("name") is-invalid @enderror" name="name"
+                value="{{ old("name") }}" required autocomplete="name" autofocus>
 
-            @error('name')
+            @error("name")
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
                 </span>
@@ -16,12 +18,12 @@
         </div>
 
         <div class="mb-3">
-            <label for="email" class="form-label">{{ __('Email Address') }}</label>
+            <label for="email" class="form-label">{{ __("Email Address") }}</label>
 
-            <input id="email" type="email" class="form-control @error('email') is-invalid @enderror"
-                name="email" value="{{ old('email') }}" required autocomplete="email">
+            <input id="email" type="email" class="form-control @error("email") is-invalid @enderror"
+                name="email" value="{{ old("email") }}" required autocomplete="email">
 
-            @error('email')
+            @error("email")
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
                 </span>
@@ -30,12 +32,12 @@
         </div>
 
         <div class="mb-3">
-            <label for="password" class="form-label">{{ __('Password') }}</label>
+            <label for="password" class="form-label">{{ __("Password") }}</label>
 
-            <input id="password" type="password" class="form-control @error('password') is-invalid @enderror"
+            <input id="password" type="password" class="form-control @error("password") is-invalid @enderror"
                 name="password" required autocomplete="new-password">
 
-            @error('password')
+            @error("password")
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
                 </span>
@@ -44,7 +46,7 @@
         </div>
 
         <div class="mb-3">
-            <label for="password-confirm" class="form-label">{{ __('Confirm Password') }}</label>
+            <label for="password-confirm" class="form-label">{{ __("Confirm Password") }}</label>
 
             <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required
                 autocomplete="new-password">
@@ -53,7 +55,7 @@
 
         <div class="d-grid mb-0">
             <button type="submit" class="btn btn-primary">
-                {{ __('Register') }}
+                {{ __("Register") }}
             </button>
         </div>
     </form>

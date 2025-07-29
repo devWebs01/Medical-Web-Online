@@ -1,45 +1,34 @@
 <?php
 
 use App\Models\User;
-use function Livewire\Volt\{computed, state, usesPagination, uses};
+use function Livewire\Volt\{computed, uses};
 use function Laravel\Folio\name;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 uses([LivewireAlert::class]);
 
-name('users.index');
-
-state(['search'])->url();
-usesPagination(theme: 'bootstrap');
+name("users.index");
 
 $users = computed(function () {
-    if ($this->search == null) {
-        return User::query()->latest()->paginate(10);
-    } else {
-        return User::query()
-            ->where(function ($query) {
-                $query->whereAny(['name', 'email', 'telp'], 'LIKE', "%{$this->search}%");
-            })
-            ->latest()
-            ->paginate(10);
-    }
+    return User::query()->latest()->get();
 });
 
 $destroy = function (User $user) {
     try {
         $user->delete();
-        $this->alert('success', 'Data user berhasil di hapus!', [
-            'position' => 'top',
-            'timer' => 3000,
-            'toast' => true,
+        $this->alert("success", "Data user berhasil di hapus!", [
+            "position" => "top",
+            "timer" => 3000,
+            "toast" => true,
         ]);
     } catch (\Throwable $th) {
-        $this->alert('error', 'Data user gagal di hapus!', [
-            'position' => 'top',
-            'timer' => 3000,
-            'toast' => true,
+        $this->alert("error", "Data user gagal di hapus!", [
+            "position" => "top",
+            "timer" => 3000,
+            "toast" => true,
         ]);
     }
+    return redirect()->route("users.index");
 };
 
 ?>
@@ -47,23 +36,21 @@ $destroy = function (User $user) {
     <div>
         <x-slot name="title">Admin</x-slot>
         <x-slot name="header">
-            <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('users.index') }}">Pengguna</a></li>
+            <li class="breadcrumb-item"><a href="{{ route("home") }}">Beranda</a></li>
+            <li class="breadcrumb-item"><a href="{{ route("users.index") }}">Pengguna</a></li>
         </x-slot>
 
+        @include("layouts.table")
         @volt
             <div>
                 <div class="card">
                     <div class="card-header">
                         <div class="row">
                             <div class="col">
-                                <a href="{{ route('users.create') }}" class="btn btn-primary">Tambah
+                                <a href="{{ route("users.create") }}" class="btn btn-primary">Tambah
                                     Pengguna</a>
                             </div>
-                            <div class="col">
-                                <input wire:model.live="search" type="search" class="form-control" name=""
-                                    id="" aria-describedby="helpId" placeholder="Masukkan nama pengguna" />
-                            </div>
+
                         </div>
                     </div>
 
@@ -86,14 +73,14 @@ $destroy = function (User $user) {
                                             <td>{{ ++$no }}</td>
                                             <td>{{ $user->name }}</td>
                                             <td>{{ $user->email }}</td>
-                                            <td>{{ __('role.' . $user->role) }}</td>
-                                            <td>{{ $user->telp ?? '-' }}</td>
+                                            <td>{{ __("role." . $user->role) }}</td>
+                                            <td>{{ $user->telp ?? "-" }}</td>
                                             <td>
-                                                <a href="{{ route('users.edit', ['user' => $user->id]) }}"
+                                                <a href="{{ route("users.edit", ["user" => $user->id]) }}"
                                                     class="btn btn-sm btn-warning">Edit</a>
                                                 <button wire:loading.attr='disabled'
                                                     wire:click='destroy({{ $user->id }})' class="btn btn-sm btn-danger">
-                                                    {{ __('Hapus') }}
+                                                    {{ __("Hapus") }}
                                                 </button>
                                             </td>
                                         </tr>
@@ -102,7 +89,6 @@ $destroy = function (User $user) {
                                 </tbody>
                             </table>
 
-                            {{ $this->users->links() }}
                         </div>
 
                     </div>
