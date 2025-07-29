@@ -1,0 +1,14 @@
+[
+    {
+        "level": "SEVERE",
+        "message": "http:\/\/localhost\/login - Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "source": "network",
+        "timestamp": 1753787830606
+    },
+    {
+        "level": "SEVERE",
+        "message": "http:\/\/localhost\/favicon.ico - Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "source": "network",
+        "timestamp": 1753787830661
+    }
+]
