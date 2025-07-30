@@ -59,7 +59,7 @@ In order to ensure that the Laravel community is welcoming to all, please review
 
 ## Security Vulnerabilities
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](base64:lkhvIbKPCAltNNHo4SNU6JZtwIp2rfFOi2uGEzvAbIQ=). All security vulnerabilities will be promptly addressed.
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](base64:PfP5pAQeU/1p4ux6Kw8nFgimzpCdhQuqURyyJgzO5JI=). All security vulnerabilities will be promptly addressed.
 
 ## License
 

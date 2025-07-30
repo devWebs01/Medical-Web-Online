@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
         $users = [
             [
                 'name' => 'User Admin',
-                'email' => 'admin@testing.com',
+                'email' => 'testingbae66@gmail.com',
                 'role' => 'admin',
             ],
             [
